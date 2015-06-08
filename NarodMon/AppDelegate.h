@@ -7,9 +7,32 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <CommonCrypto/CommonDigest.h>
+#import "SetCoordinates.h"
+
+extern NSString* const apiKey;
+
+NSUserDefaults *userDefaults;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
+{
+    SetCoordinates *coordsWindow;
+}
 
-@property (assign) IBOutlet NSWindow *window;
+typedef NS_ENUM(NSUInteger, Type) {
+    DEGREES = 1
+};
 
+@property (strong) IBOutlet NSStatusItem *statusBar;
+@property (weak) IBOutlet NSMenu *statusMenu;
+@property (weak) IBOutlet NSMenuItem *latestUpdateTime;
+
+- (NSString*)formatOutput:(float)value withSign:(Type)sign;
+- (IBAction)updateBtnPress:(NSMenuItem *)sender;
+- (IBAction)setCoordinatesBtnPress:(NSMenuItem *)sender;
+
+@end
+
+@interface NSString (MD5_Hash)
++ (NSString *) md5:(NSString*)concat;
 @end

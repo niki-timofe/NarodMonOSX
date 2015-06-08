@@ -18,6 +18,8 @@
 		C5DBD7BC1960C22000E96244 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DBD79B1960C22000E96244 /* Cocoa.framework */; };
 		C5DBD7C41960C22000E96244 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7C21960C22000E96244 /* InfoPlist.strings */; };
 		C5DBD7C61960C22000E96244 /* NarodMonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7C51960C22000E96244 /* NarodMonTests.m */; };
+		C5DBD7D4196173A200E96244 /* SetCoordinates.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7D2196173A200E96244 /* SetCoordinates.m */; };
+		C5DBD7D5196173A200E96244 /* SetCoordinates.xib in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7D3196173A200E96244 /* SetCoordinates.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +52,9 @@
 		C5DBD7C11960C22000E96244 /* NarodMonTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NarodMonTests-Info.plist"; sourceTree = "<group>"; };
 		C5DBD7C31960C22000E96244 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C5DBD7C51960C22000E96244 /* NarodMonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NarodMonTests.m; sourceTree = "<group>"; };
+		C5DBD7D1196173A200E96244 /* SetCoordinates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetCoordinates.h; sourceTree = "<group>"; };
+		C5DBD7D2196173A200E96244 /* SetCoordinates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetCoordinates.m; sourceTree = "<group>"; };
+		C5DBD7D3196173A200E96244 /* SetCoordinates.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetCoordinates.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +120,7 @@
 		C5DBD7A11960C22000E96244 /* NarodMon */ = {
 			isa = PBXGroup;
 			children = (
+				C5DBD7D01961735800E96244 /* Setup */,
 				C5DBD7AD1960C22000E96244 /* AppDelegate.h */,
 				C5DBD7AE1960C22000E96244 /* AppDelegate.m */,
 				C5DBD7B01960C22000E96244 /* MainMenu.xib */,
@@ -152,6 +158,16 @@
 				C5DBD7C21960C22000E96244 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		C5DBD7D01961735800E96244 /* Setup */ = {
+			isa = PBXGroup;
+			children = (
+				C5DBD7D1196173A200E96244 /* SetCoordinates.h */,
+				C5DBD7D2196173A200E96244 /* SetCoordinates.m */,
+				C5DBD7D3196173A200E96244 /* SetCoordinates.xib */,
+			);
+			name = Setup;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -233,6 +249,7 @@
 				C5DBD7A61960C22000E96244 /* InfoPlist.strings in Resources */,
 				C5DBD7B41960C22000E96244 /* Images.xcassets in Resources */,
 				C5DBD7AC1960C22000E96244 /* Credits.rtf in Resources */,
+				C5DBD7D5196173A200E96244 /* SetCoordinates.xib in Resources */,
 				C5DBD7B21960C22000E96244 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -253,6 +270,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5DBD7AF1960C22000E96244 /* AppDelegate.m in Sources */,
+				C5DBD7D4196173A200E96244 /* SetCoordinates.m in Sources */,
 				C5DBD7A81960C22000E96244 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -466,6 +484,7 @@
 				C5DBD7CB1960C22000E96244 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C5DBD7CC1960C22000E96244 /* Build configuration list for PBXNativeTarget "NarodMonTests" */ = {
 			isa = XCConfigurationList;
@@ -474,6 +493,7 @@
 				C5DBD7CE1960C22000E96244 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
