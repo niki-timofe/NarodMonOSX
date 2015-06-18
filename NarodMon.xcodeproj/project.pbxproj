@@ -20,7 +20,6 @@
 		C5DBD7C61960C22000E96244 /* NarodMonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7C51960C22000E96244 /* NarodMonTests.m */; };
 		C5DBD7D4196173A200E96244 /* SetCoordinates.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7D2196173A200E96244 /* SetCoordinates.m */; };
 		C5DBD7D5196173A200E96244 /* SetCoordinates.xib in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7D3196173A200E96244 /* SetCoordinates.xib */; };
-		C5E893B81B337BC0003F166B /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = C5E893B71B337BC0003F166B /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,10 +39,8 @@
 		C5DBD79F1960C22000E96244 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		C5DBD7A01960C22000E96244 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C5DBD7A31960C22000E96244 /* NarodMon-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NarodMon-Info.plist"; sourceTree = "<group>"; };
-		C5DBD7A51960C22000E96244 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C5DBD7A71960C22000E96244 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C5DBD7A91960C22000E96244 /* NarodMon-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NarodMon-Prefix.pch"; sourceTree = "<group>"; };
-		C5DBD7AB1960C22000E96244 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		C5DBD7AD1960C22000E96244 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C5DBD7AE1960C22000E96244 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		C5DBD7B11960C22000E96244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -51,12 +48,14 @@
 		C5DBD7B91960C22000E96244 /* NarodMonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NarodMonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5DBD7BA1960C22000E96244 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		C5DBD7C11960C22000E96244 /* NarodMonTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NarodMonTests-Info.plist"; sourceTree = "<group>"; };
-		C5DBD7C31960C22000E96244 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C5DBD7C51960C22000E96244 /* NarodMonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NarodMonTests.m; sourceTree = "<group>"; };
 		C5DBD7D1196173A200E96244 /* SetCoordinates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetCoordinates.h; sourceTree = "<group>"; };
 		C5DBD7D2196173A200E96244 /* SetCoordinates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetCoordinates.m; sourceTree = "<group>"; };
 		C5DBD7D3196173A200E96244 /* SetCoordinates.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetCoordinates.xib; sourceTree = "<group>"; };
-		C5E893B71B337BC0003F166B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		C5E893B91B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		C5E893BA1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ru; path = ru.lproj/Credits.rtf; sourceTree = "<group>"; };
+		C5E893BB1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		C5E893BC1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,7 +134,6 @@
 		C5DBD7A21960C22000E96244 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				C5E893B71B337BC0003F166B /* README.md */,
 				C5DBD7A31960C22000E96244 /* NarodMon-Info.plist */,
 				C5DBD7A41960C22000E96244 /* InfoPlist.strings */,
 				C5DBD7A71960C22000E96244 /* main.m */,
@@ -231,8 +229,8 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				ru,
 			);
 			mainGroup = C5DBD78F1960C21F00E96244;
 			productRefGroup = C5DBD7991960C22000E96244 /* Products */;
@@ -292,7 +290,6 @@
 			files = (
 				C5DBD7AF1960C22000E96244 /* AppDelegate.m in Sources */,
 				C5DBD7D4196173A200E96244 /* SetCoordinates.m in Sources */,
-				C5E893B81B337BC0003F166B /* README.md in Sources */,
 				C5DBD7A81960C22000E96244 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -319,7 +316,7 @@
 		C5DBD7A41960C22000E96244 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				C5DBD7A51960C22000E96244 /* en */,
+				C5E893B91B33841D003F166B /* ru */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -327,7 +324,7 @@
 		C5DBD7AA1960C22000E96244 /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
-				C5DBD7AB1960C22000E96244 /* en */,
+				C5E893BA1B33841D003F166B /* ru */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
@@ -336,6 +333,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				C5DBD7B11960C22000E96244 /* Base */,
+				C5E893BB1B33841D003F166B /* ru */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -343,7 +341,7 @@
 		C5DBD7C21960C22000E96244 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				C5DBD7C31960C22000E96244 /* en */,
+				C5E893BC1B33841D003F166B /* ru */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
