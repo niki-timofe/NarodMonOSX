@@ -131,7 +131,6 @@ NSString *uuidStr;
     
     NSError * error;
     NSMutableDictionary  * json = [NSJSONSerialization JSONObjectWithData:_responseData options: NSJSONReadingMutableContainers error: &error];
-    NSLog(@"%@",json);
     
     float min = FLT_MAX;
     float sum = 0;
