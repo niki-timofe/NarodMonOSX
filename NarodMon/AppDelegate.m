@@ -52,7 +52,8 @@ NSString *uuidStr;
 
 - (IBAction)setCoordinatesBtnPress:(NSMenuItem *)sender {
     if (!coordsWindow) {
-        coordsWindow = [[SetCoordinates alloc] initWithWindowNibName:@"SetCoordinates"];
+        coordsWindow = [[SetCoordinates alloc]
+                        initWithWindowNibName:@"SetCoordinates"];
     }
     [coordsWindow showWindow:self];
 }
@@ -67,6 +68,7 @@ NSString *uuidStr;
     
     if (![userDefaults objectForKey:@"SensorID"]) {
         [userDefaults setInteger:0 forKey:@"SensorID"];
+        [userDefaults setBool:NO forKey:@"SensorMode"];
     }
     
     if (![userDefaults objectForKey:@"uuid"]) {
@@ -79,19 +81,35 @@ NSString *uuidStr;
     
     uuidStr = [NSString md5:uuidStr];
     
+    NSDictionary *dictionary;
     
-    float lat = [userDefaults floatForKey:@"CoordinatesLat"];
-    float lng = [userDefaults floatForKey:@"CoordinatesLng"];
-    
-    NSDictionary *dictionary = @{@"cmd": @"sensorNear", @"lat":[NSNumber numberWithFloat:lat], @"lng":[NSNumber numberWithFloat:lng], @"radius":@3, @"uuid":uuidStr, @"api_key":apiKey, @"lang":@"ru", @"types":[NSArray arrayWithObject:@1], @"pub":@1};
-    
-    
-    
-    /*NSDictionary *dictionary = @{@"cmd": @"sensorInfo", @"sensor":[userDefaults stringForKey:@"SensorID"], @"limit":@1, @"uuid":uuidStr, @"api_key":apiKey, @"lang":@"ru"};*/
+    if (![userDefaults boolForKey:@"SensorMode"]) {
+        float lat = [userDefaults floatForKey:@"CoordinatesLat"];
+        float lng = [userDefaults floatForKey:@"CoordinatesLng"];
+        
+        dictionary = @{@"cmd": @"sensorNear",
+                       @"lat":[NSNumber numberWithFloat:lat],
+                       @"lng":[NSNumber numberWithFloat:lng],
+                       @"radius":@3,
+                       @"uuid":uuidStr,
+                       @"api_key":apiKey,
+                       @"lang":@"ru",
+                       @"types":[NSArray arrayWithObject:@1],
+                       @"pub":@1};
+    } else {
+            dictionary = @{@"cmd": @"sensorInfo",
+                           @"sensors":[NSArray arrayWithObject:[userDefaults stringForKey:@"SensorID"]],
+                           @"uuid":uuidStr,
+                           @"api_key":apiKey,
+                           @"lang":@"ru"};
+    }
     
     
     NSError *error = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:&error];
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary
+                                            options:0
+                                            error:&error];
+    
     if (jsonData) {
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://narodmon.ru/client.php"]];
         [request setHTTPMethod:@"POST"];
@@ -129,31 +147,42 @@ NSString *uuidStr;
     // The request is complete and data has been received
     // You can parse the stuff in your instance variable now
     
-    NSError * error;
-    NSMutableDictionary  * json = [NSJSONSerialization JSONObjectWithData:_responseData options: NSJSONReadingMutableContainers error: &error];
+    NSError *error;
+    NSMutableDictionary *json = [NSJSONSerialization
+                                 JSONObjectWithData:_responseData
+                                 options: NSJSONReadingMutableContainers
+                                 error: &error];
     
-    float min = FLT_MAX;
-    float sum = 0;
-    float count = 0;
-    float tmp = 0;
+    if (![userDefaults boolForKey:@"SensorMode"]) {
+        float min = FLT_MAX;
+        float sum = 0;
+        float count = 0;
+        float tmp = 0;
     
-    for (int i = 0; i < [json[@"devices"] count]; i++) {
-        for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
+        for (int i = 0; i < [json[@"devices"] count]; i++) {
+            for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
             
-            if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1) {
-                tmp = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
+                if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1) {
+                    tmp = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
                 
-                sum += tmp;
-                count++;
+                    sum += tmp;
+                    count++;
                 
-                if (min > tmp) {
-                    min = tmp;
+                    if (min > tmp) {
+                        min = tmp;
+                    }
                 }
             }
         }
-    }
     
-    self.statusBar.title = [self formatOutput:((min + (min + sum / count) / 2) / 2) withSign:1];
+        self.statusBar.title = [self
+                            formatOutput:((min + (min + sum / count) / 2) / 2)
+                            withSign:1];
+    } else {
+        NSLog(@"%@", json);
+        self.statusBar.title = [self formatOutput:[json[@"sensors"][0][@"value"]
+                                                   floatValue] withSign:1];
+    }
     
     NSDateFormatter *formatter;
     NSString        *dateString;
@@ -176,7 +205,9 @@ NSString *uuidStr;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    self.statusBar = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    self.statusBar = [[NSStatusBar systemStatusBar]
+                      statusItemWithLength:NSVariableStatusItemLength];
+    
     self.statusBar.title = [self formatOutput:0 withSign:DEGREES];
     [self update];
     //self.statusBar.image =
@@ -184,6 +215,10 @@ NSString *uuidStr;
     self.statusBar.menu = self.statusMenu;
     self.statusBar.highlightMode = YES;
     
-    timer = [NSTimer scheduledTimerWithTimeInterval:5*60 target:self selector:@selector(update) userInfo:nil repeats:YES];
+    timer = [NSTimer scheduledTimerWithTimeInterval:5*60
+                                             target:self
+                                           selector:@selector(update)
+                                           userInfo:nil
+                                            repeats:YES];
 }
 @end
