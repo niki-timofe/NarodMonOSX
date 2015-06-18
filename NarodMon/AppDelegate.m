@@ -133,17 +133,28 @@ NSString *uuidStr;
     NSMutableDictionary  * json = [NSJSONSerialization JSONObjectWithData:_responseData options: NSJSONReadingMutableContainers error: &error];
     NSLog(@"%@",json);
     
-    float value = FLT_MAX;
+    float min = FLT_MAX;
+    float sum = 0;
+    float count = 0;
+    float tmp = 0;
     
     for (int i = 0; i < [json[@"devices"] count]; i++) {
         for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
-            if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1 && value > [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue]) {
-                value = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
+            
+            if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1) {
+                tmp = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
+                
+                sum += tmp;
+                count++;
+                
+                if (min > tmp) {
+                    min = tmp;
+                }
             }
         }
     }
     
-    self.statusBar.title = [self formatOutput:value withSign:1];
+    self.statusBar.title = [self formatOutput:((min + (min + sum / count) / 2) / 2) withSign:1];
     
     NSDateFormatter *formatter;
     NSString        *dateString;
