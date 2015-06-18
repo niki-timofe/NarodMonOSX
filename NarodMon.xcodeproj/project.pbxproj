@@ -20,6 +20,7 @@
 		C5DBD7C61960C22000E96244 /* NarodMonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7C51960C22000E96244 /* NarodMonTests.m */; };
 		C5DBD7D4196173A200E96244 /* SetCoordinates.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7D2196173A200E96244 /* SetCoordinates.m */; };
 		C5DBD7D5196173A200E96244 /* SetCoordinates.xib in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7D3196173A200E96244 /* SetCoordinates.xib */; };
+		C5E893B81B337BC0003F166B /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = C5E893B71B337BC0003F166B /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		C5DBD7D1196173A200E96244 /* SetCoordinates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetCoordinates.h; sourceTree = "<group>"; };
 		C5DBD7D2196173A200E96244 /* SetCoordinates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetCoordinates.m; sourceTree = "<group>"; };
 		C5DBD7D3196173A200E96244 /* SetCoordinates.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetCoordinates.xib; sourceTree = "<group>"; };
+		C5E893B71B337BC0003F166B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +135,7 @@
 		C5DBD7A21960C22000E96244 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C5E893B71B337BC0003F166B /* README.md */,
 				C5DBD7A31960C22000E96244 /* NarodMon-Info.plist */,
 				C5DBD7A41960C22000E96244 /* InfoPlist.strings */,
 				C5DBD7A71960C22000E96244 /* main.m */,
@@ -289,6 +292,7 @@
 			files = (
 				C5DBD7AF1960C22000E96244 /* AppDelegate.m in Sources */,
 				C5DBD7D4196173A200E96244 /* SetCoordinates.m in Sources */,
+				C5E893B81B337BC0003F166B /* README.md in Sources */,
 				C5DBD7A81960C22000E96244 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
