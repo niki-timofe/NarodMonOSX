@@ -31,6 +31,8 @@ typedef NS_ENUM(NSUInteger, Type) {
 - (IBAction)updateBtnPress:(NSMenuItem *)sender;
 - (IBAction)setCoordinatesBtnPress:(NSMenuItem *)sender;
 
+-(void)apiRequest:(NSDictionary*)dictionary;
+
 @end
 
 @interface NSString (MD5_Hash)

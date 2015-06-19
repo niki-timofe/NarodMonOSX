@@ -60,27 +60,6 @@ NSString *uuidStr;
 
 - (void)update
 {
-    userDefaults = [NSUserDefaults standardUserDefaults];
-    if (![userDefaults objectForKey:@"CoordinatesLat"]) {
-        [userDefaults setFloat:0  forKey:@"CoordinatesLat"];
-        [userDefaults setFloat:0  forKey:@"CoordinatesLng"];
-    }
-    
-    if (![userDefaults objectForKey:@"SensorID"]) {
-        [userDefaults setInteger:0 forKey:@"SensorID"];
-        [userDefaults setBool:NO forKey:@"SensorMode"];
-    }
-    
-    if (![userDefaults objectForKey:@"uuid"]) {
-        CFUUIDRef uuid = CFUUIDCreate(NULL);
-        uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(NULL, uuid);
-        [userDefaults setValue:uuidStr  forKey:@"uuid"];
-    } else {
-        uuidStr = [userDefaults stringForKey:@"uuid"];
-    }
-    
-    uuidStr = [NSString md5:uuidStr];
-    
     NSDictionary *dictionary;
     
     if (![userDefaults boolForKey:@"SensorMode"]) {
@@ -97,18 +76,18 @@ NSString *uuidStr;
                        @"types":[NSArray arrayWithObject:@1],
                        @"pub":@1};
     } else {
-            dictionary = @{@"cmd": @"sensorInfo",
-                           @"sensors":[NSArray arrayWithObject:[userDefaults stringForKey:@"SensorID"]],
-                           @"uuid":uuidStr,
-                           @"api_key":apiKey,
-                           @"lang":@"ru"};
+        dictionary = @{@"cmd": @"sensorInfo",
+                       @"sensors":[NSArray arrayWithObject:[userDefaults stringForKey:@"SensorID"]],
+                       @"uuid":uuidStr,
+                       @"api_key":apiKey,
+                       @"lang":@"ru"};
     }
     
     
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary
-                                            options:0
-                                            error:&error];
+                                                       options:0
+                                                         error:&error];
     
     if (jsonData) {
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://narodmon.ru/client.php"]];
@@ -119,7 +98,7 @@ NSString *uuidStr;
     } else {
         NSLog(@"Unable to serialize the data %@: %@", dictionary, error);
     }
-
+    
     
 }
 
@@ -153,45 +132,64 @@ NSString *uuidStr;
                                  options: NSJSONReadingMutableContainers
                                  error: &error];
     
-    if (![userDefaults boolForKey:@"SensorMode"]) {
-        float min = FLT_MAX;
-        float sum = 0;
-        float count = 0;
-        float tmp = 0;
+    NSLog(@"%@", json[@"latest"]);
     
-        for (int i = 0; i < [json[@"devices"] count]; i++) {
-            for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
+    if (!json[@"latest"]) {
+        if (![userDefaults boolForKey:@"SensorMode"]) {
+            float min = FLT_MAX;
+            float sum = 0;
+            float count = 0;
+            float tmp = 0;
             
-                if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1) {
-                    tmp = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
-                
-                    sum += tmp;
-                    count++;
-                
-                    if (min > tmp) {
-                        min = tmp;
+            for (int i = 0; i < [json[@"devices"] count]; i++) {
+                for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
+                    
+                    if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1) {
+                        tmp = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
+                        
+                        sum += tmp;
+                        count++;
+                        
+                        if (min > tmp) {
+                            min = tmp;
+                        }
                     }
                 }
             }
+            
+            self.statusBar.title = [self
+                                    formatOutput:((min + (min + sum / count) / 2) / 2)
+                                    withSign:1];
+        } else {
+            self.statusBar.title = [self formatOutput:[json[@"sensors"][0][@"value"]
+                                                       floatValue] withSign:1];
         }
-    
-        self.statusBar.title = [self
-                            formatOutput:((min + (min + sum / count) / 2) / 2)
-                            withSign:1];
+        
+        NSDateFormatter *formatter;
+        NSString        *dateString;
+        
+        formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"HH:mm"];
+        
+        dateString = [formatter stringFromDate:[NSDate date]];
+        [[self latestUpdateTime] setTitle:dateString];
+        
     } else {
+        
+        if (![userDefaults objectForKey:@"CoordinatesLat"]) {
+            [userDefaults setFloat:[json[@"lat"] floatValue]  forKey:@"CoordinatesLat"];
+            [userDefaults setFloat:[json[@"lng"] floatValue]  forKey:@"CoordinatesLng"];
+        }
+        
+        [self update];
+        timer = [NSTimer scheduledTimerWithTimeInterval:5*60
+                                                 target:self
+                                               selector:@selector(update)
+                                               userInfo:nil
+                                                repeats:YES];
+        
         NSLog(@"%@", json);
-        self.statusBar.title = [self formatOutput:[json[@"sensors"][0][@"value"]
-                                                   floatValue] withSign:1];
     }
-    
-    NSDateFormatter *formatter;
-    NSString        *dateString;
-    
-    formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"HH:mm"];
-    
-    dateString = [formatter stringFromDate:[NSDate date]];
-    [[self latestUpdateTime] setTitle:dateString];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
@@ -200,7 +198,26 @@ NSString *uuidStr;
 }
 
 
-
+- (void)apiRequest:(NSDictionary *)dictionary
+{
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary
+                                                       options:0
+                                                         error:&error];
+    
+    if (jsonData) {
+        NSMutableURLRequest *request = [NSMutableURLRequest
+                                        requestWithURL:[NSURL
+                                                        URLWithString:@"http://narodmon.ru/client.php"]];
+        
+        [request setHTTPMethod:@"POST"];
+        
+        [request setHTTPBody:jsonData];
+        (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
+    } else {
+        NSLog(@"Unable to serialize the data %@: %@", dictionary, error);
+    }
+}
 
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -209,16 +226,36 @@ NSString *uuidStr;
                       statusItemWithLength:NSVariableStatusItemLength];
     
     self.statusBar.title = [self formatOutput:0 withSign:DEGREES];
-    [self update];
+    
+    userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    if (![userDefaults objectForKey:@"SensorID"]) {
+        [userDefaults setInteger:0 forKey:@"SensorID"];
+        [userDefaults setBool:NO forKey:@"SensorMode"];
+    }
+    
+    if (![userDefaults objectForKey:@"uuid"]) {
+        CFUUIDRef uuid = CFUUIDCreate(NULL);
+        uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(NULL, uuid);
+        [userDefaults setValue:uuidStr  forKey:@"uuid"];
+    } else {
+        uuidStr = [userDefaults stringForKey:@"uuid"];
+    }
+    
+    uuidStr = [NSString md5:uuidStr];
+    
+    [self apiRequest:@{@"cmd":@"sensorInit",
+                       @"version":[NSString stringWithFormat:@"%@",
+                                   [[NSBundle mainBundle]
+                                    objectForInfoDictionaryKey:@"CFBundleShortVersionString"]],
+                       @"platform":[NSString stringWithFormat:@"%ld.%ld.%ld", (long)[[NSProcessInfo processInfo] operatingSystemVersion].majorVersion, (long)[[NSProcessInfo processInfo] operatingSystemVersion].minorVersion, (long)[[NSProcessInfo processInfo] operatingSystemVersion].patchVersion],
+                       @"lang":@"ru",
+                       @"uuid":uuidStr,
+                       @"api_key":apiKey,}];
+    
     //self.statusBar.image =
     
     self.statusBar.menu = self.statusMenu;
     self.statusBar.highlightMode = YES;
-    
-    timer = [NSTimer scheduledTimerWithTimeInterval:5*60
-                                             target:self
-                                           selector:@selector(update)
-                                           userInfo:nil
-                                            repeats:YES];
 }
 @end
