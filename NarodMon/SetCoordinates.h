@@ -17,5 +17,6 @@ NSUserDefaults *userDefaults;
 @property (weak) IBOutlet NSTextField *coordinatesLngField;
 @property (weak) IBOutlet NSTextField *sensorID;
 @property (weak) IBOutlet NSButton *modeSwitcher;
+@property (weak) IBOutlet NSTextField *radiusField;
 
 @end

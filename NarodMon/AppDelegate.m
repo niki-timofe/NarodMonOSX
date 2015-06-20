@@ -50,12 +50,16 @@ NSString *uuidStr;
     [self update];
 }
 
-- (IBAction)setCoordinatesBtnPress:(NSMenuItem *)sender {
+- (void)openCoordsWindow {
     if (!coordsWindow) {
         coordsWindow = [[SetCoordinates alloc]
                         initWithWindowNibName:@"SetCoordinates"];
     }
     [coordsWindow showWindow:self];
+}
+
+- (IBAction)setCoordinatesBtnPress:(NSMenuItem *)sender {
+    [self openCoordsWindow];
 }
 
 - (void)update
@@ -77,55 +81,31 @@ NSString *uuidStr;
                        @"pub":@1};
     } else {
         dictionary = @{@"cmd": @"sensorInfo",
-                       @"sensors":[NSArray arrayWithObject:[userDefaults stringForKey:@"SensorID"]],
+                       @"sensors":[NSArray
+                                   arrayWithObject:[userDefaults stringForKey:@"SensorID"]],
                        @"uuid":uuidStr,
                        @"api_key":apiKey,
                        @"lang":@"ru"};
     }
     
-    
-    NSError *error = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dictionary
-                                                       options:0
-                                                         error:&error];
-    
-    if (jsonData) {
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://narodmon.ru/client.php"]];
-        [request setHTTPMethod:@"POST"];
-        
-        [request setHTTPBody:jsonData];
-        (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
-    } else {
-        NSLog(@"Unable to serialize the data %@: %@", dictionary, error);
-    }
-    
-    
+    [self apiRequest:dictionary];
 }
 
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    // A response has been received, this is where we initialize the instance var you created
-    // so that we can append data to it in the didReceiveData method
-    // Furthermore, this method is called each time there is a redirect so reinitializing it
-    // also serves to clear it
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)respoapinse {
     _responseData = [[NSMutableData alloc] init];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    // Append the new data to the instance variable you declared
     [_responseData appendData:data];
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection
                   willCacheResponse:(NSCachedURLResponse*)cachedResponse {
-    // Return nil to indicate not necessary to store a cached response for this connection
     return nil;
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    // The request is complete and data has been received
-    // You can parse the stuff in your instance variable now
-    
     NSError *error;
     NSMutableDictionary *json = [NSJSONSerialization
                                  JSONObjectWithData:_responseData
@@ -176,9 +156,30 @@ NSString *uuidStr;
         
     } else {
         
+        if (json[@"latest"] != [NSString stringWithFormat:@"%@",
+                               [[NSBundle mainBundle]
+                                objectForInfoDictionaryKey:@"CFBundleShortVersionString"]])
+            {
+                NSAlert *alert = [[NSAlert alloc] init];
+                [alert addButtonWithTitle:@"Сейчас"];
+                [alert addButtonWithTitle:@"Потом"];
+                [alert setMessageText:@"Доступна новая версия виджета народного мониторинга."];
+                [alert setInformativeText:@"Вы можете загрузить новую версию сейчас, или потом."];
+                [alert setAlertStyle:NSInformationalAlertStyle];
+            
+                if ([alert runModal] == NSAlertFirstButtonReturn) {
+                    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:json[@"url"]]];
+                    [NSApp terminate:self];
+                }
+            }
+        
+        if (![userDefaults objectForKey:@"Radius"]) {
+            [userDefaults setInteger:3 forKey:@"Radius"];
+        }
         if (![userDefaults objectForKey:@"CoordinatesLat"]) {
             [userDefaults setFloat:[json[@"lat"] floatValue]  forKey:@"CoordinatesLat"];
             [userDefaults setFloat:[json[@"lng"] floatValue]  forKey:@"CoordinatesLng"];
+            [self openCoordsWindow];
         }
         
         [self update];
@@ -193,8 +194,6 @@ NSString *uuidStr;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    // The request has failed for some reason!
-    // Check the error var
 }
 
 
