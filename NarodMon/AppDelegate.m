@@ -126,8 +126,6 @@ NSString *uuidStr;
                                  options: NSJSONReadingMutableContainers
                                  error: &error];
     
-    NSLog(@"%@", json);
-    
     if (!json[@"latest"]) {
         if (![userDefaults boolForKey:@"SensorMode"]) {
             float min = FLT_MAX;
@@ -236,7 +234,6 @@ NSString *uuidStr;
         [request setHTTPBody:jsonData];
         (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
     } else {
-        NSLog(@"Unable to serialize the data %@: %@", dictionary, error);
     }
 }
 
