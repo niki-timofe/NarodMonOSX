@@ -113,6 +113,11 @@ NSString *uuidStr;
     return nil;
 }
 
+- (void)update
+{
+    [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
+}
+
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     NSError *error;
     NSMutableDictionary *json = [NSJSONSerialization
@@ -195,7 +200,7 @@ NSString *uuidStr;
         }
         
         [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
-        timer = [NSTimer scheduledTimerWithTimeInterval:5*60
+        timer = [NSTimer scheduledTimerWithTimeInterval:1.5*60
                                                  target:self
                                                selector:@selector(update)
                                                userInfo:nil
