@@ -47,7 +47,7 @@ NSString *uuidStr;
 }
 
 - (IBAction)updateBtnPress:(NSMenuItem *)sender {
-    [self update];
+    [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
 }
 
 - (void)openCoordsWindow {
@@ -62,30 +62,38 @@ NSString *uuidStr;
     [self openCoordsWindow];
 }
 
-- (void)update
+- (void)updateWithRadius:(NSInteger)radius
 {
-    NSDictionary *dictionary;
+    NSMutableDictionary *dictionary;
     
     if (![userDefaults boolForKey:@"SensorMode"]) {
         float lat = [userDefaults floatForKey:@"CoordinatesLat"];
         float lng = [userDefaults floatForKey:@"CoordinatesLng"];
         
-        dictionary = @{@"cmd": @"sensorNear",
+        dictionary = [[NSMutableDictionary alloc] initWithDictionary:
+                     @{@"cmd": @"sensorNear",
                        @"lat":[NSNumber numberWithFloat:lat],
                        @"lng":[NSNumber numberWithFloat:lng],
-                       @"radius":@3,
                        @"uuid":uuidStr,
                        @"api_key":apiKey,
                        @"lang":@"ru",
                        @"types":[NSArray arrayWithObject:@1],
-                       @"pub":@1};
+                       @"pub":@1}];
+        
+        if (radius > 0) {
+            [dictionary setObject:[NSNumber numberWithInteger:radius] forKey:@"radius"];
+        } else {
+            [dictionary setObject:[NSNumber numberWithInteger:1] forKey:@"limit"];
+        }
+        
     } else {
-        dictionary = @{@"cmd": @"sensorInfo",
+        dictionary = [[NSMutableDictionary alloc] initWithDictionary:
+                     @{@"cmd": @"sensorInfo",
                        @"sensors":[NSArray
                                    arrayWithObject:[userDefaults stringForKey:@"SensorID"]],
                        @"uuid":uuidStr,
                        @"api_key":apiKey,
-                       @"lang":@"ru"};
+                       @"lang":@"ru"}];
     }
     
     [self apiRequest:dictionary];
@@ -112,7 +120,7 @@ NSString *uuidStr;
                                  options: NSJSONReadingMutableContainers
                                  error: &error];
     
-    NSLog(@"%@", json[@"latest"]);
+    NSLog(@"%@", json);
     
     if (!json[@"latest"]) {
         if (![userDefaults boolForKey:@"SensorMode"]) {
@@ -135,6 +143,10 @@ NSString *uuidStr;
                         }
                     }
                 }
+            }
+            
+            if  (count == 0) {
+                [self updateWithRadius:0];
             }
             
             self.statusBar.title = [self
@@ -174,7 +186,7 @@ NSString *uuidStr;
             }
         
         if (![userDefaults objectForKey:@"Radius"]) {
-            [userDefaults setInteger:3 forKey:@"Radius"];
+            [userDefaults setInteger:0 forKey:@"Radius"];
         }
         if (![userDefaults objectForKey:@"CoordinatesLat"]) {
             [userDefaults setFloat:[json[@"lat"] floatValue]  forKey:@"CoordinatesLat"];
@@ -182,14 +194,12 @@ NSString *uuidStr;
             [self openCoordsWindow];
         }
         
-        [self update];
+        [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
         timer = [NSTimer scheduledTimerWithTimeInterval:5*60
                                                  target:self
                                                selector:@selector(update)
                                                userInfo:nil
                                                 repeats:YES];
-        
-        NSLog(@"%@", json);
     }
 }
 
