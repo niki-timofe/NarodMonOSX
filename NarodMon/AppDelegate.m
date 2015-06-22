@@ -12,6 +12,7 @@
 NSString *const apiKey = @"40MHsctSKi4y6";
 NSMutableData *_responseData;
 NSTimer *timer;
+NSTimer *appUpdate;
 NSString *uuidStr;
 
 @implementation NSString (MD5_Hash)
@@ -205,6 +206,12 @@ NSString *uuidStr;
                                                selector:@selector(update)
                                                userInfo:nil
                                                 repeats:YES];
+        
+        appUpdate = [NSTimer scheduledTimerWithTimeInterval:1.5*60*60
+                                                 target:self
+                                               selector:@selector(sensorInit)
+                                               userInfo:nil
+                                                repeats:YES];
     }
 }
 
@@ -234,20 +241,8 @@ NSString *uuidStr;
 }
 
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+- (void)sensorInit
 {
-    self.statusBar = [[NSStatusBar systemStatusBar]
-                      statusItemWithLength:NSVariableStatusItemLength];
-    
-    self.statusBar.title = [self formatOutput:0 withSign:DEGREES];
-    
-    userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    if (![userDefaults objectForKey:@"SensorID"]) {
-        [userDefaults setInteger:0 forKey:@"SensorID"];
-        [userDefaults setBool:NO forKey:@"SensorMode"];
-    }
-    
     if (![userDefaults objectForKey:@"uuid"]) {
         CFUUIDRef uuid = CFUUIDCreate(NULL);
         uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(NULL, uuid);
@@ -266,6 +261,23 @@ NSString *uuidStr;
                        @"lang":@"ru",
                        @"uuid":uuidStr,
                        @"api_key":apiKey,}];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    self.statusBar = [[NSStatusBar systemStatusBar]
+                      statusItemWithLength:NSVariableStatusItemLength];
+    
+    self.statusBar.title = [self formatOutput:0 withSign:DEGREES];
+    
+    userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    if (![userDefaults objectForKey:@"SensorID"]) {
+        [userDefaults setInteger:0 forKey:@"SensorID"];
+        [userDefaults setBool:NO forKey:@"SensorMode"];
+    }
+    
+    [self sensorInit];
     
     //self.statusBar.image =
     
