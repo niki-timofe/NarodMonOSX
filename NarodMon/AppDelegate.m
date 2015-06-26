@@ -121,7 +121,7 @@ NSString *uuidStr;
                                              target:self
                                            selector:@selector(update)
                                            userInfo:nil
-                                            repeats:YES];
+                                            repeats:NO];
     
     [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
 }
