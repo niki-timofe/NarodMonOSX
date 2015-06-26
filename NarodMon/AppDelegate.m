@@ -203,7 +203,8 @@ NSString *uuidStr;
         }
         
         [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
-        timer = [NSTimer scheduledTimerWithTimeInterval:1.5*60
+        
+        timer = [NSTimer scheduledTimerWithTimeInterval:[userDefaults integerForKey:@"UpdateInterval"] * 60
                                                  target:self
                                                selector:@selector(update)
                                                userInfo:nil
@@ -218,6 +219,7 @@ NSString *uuidStr;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    [[NSAlert alertWithError:error] runModal];
 }
 
 
@@ -241,13 +243,35 @@ NSString *uuidStr;
     }
 }
 
+- (NSString *)serialNumber
+{
+    io_service_t    platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault,
+                                                                 
+                                                                 IOServiceMatching("IOPlatformExpertDevice"));
+    CFStringRef serialNumberAsCFString = NULL;
+    
+    if (platformExpert) {
+        serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert,
+                                                                 CFSTR(kIOPlatformSerialNumberKey),
+                                                                 kCFAllocatorDefault, 0);
+        IOObjectRelease(platformExpert);
+    }
+    
+    NSString *serialNumberAsNSString = nil;
+    if (serialNumberAsCFString) {
+        serialNumberAsNSString = [NSString stringWithString:(__bridge NSString *)serialNumberAsCFString];
+        CFRelease(serialNumberAsCFString);
+    }
+    
+    return serialNumberAsNSString;
+}
 
 - (void)sensorInit
 {
-    if (![userDefaults objectForKey:@"uuid"]) {
-        CFUUIDRef uuid = CFUUIDCreate(NULL);
-        uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(NULL, uuid);
-        [userDefaults setValue:uuidStr  forKey:@"uuid"];
+    if ([userDefaults stringForKey:@"uuid"] != [self serialNumber]) {
+        uuidStr = [self serialNumber];
+        
+        [userDefaults setValue:uuidStr forKey:@"uuid"];
     } else {
         uuidStr = [userDefaults stringForKey:@"uuid"];
     }
@@ -276,6 +300,10 @@ NSString *uuidStr;
     if (![userDefaults objectForKey:@"SensorID"]) {
         [userDefaults setInteger:0 forKey:@"SensorID"];
         [userDefaults setBool:NO forKey:@"SensorMode"];
+    }
+    
+    if (![userDefaults objectForKey:@"UpdateInterval"]) {
+        [userDefaults setObject:@3 forKey:@"UpdateInterval"];
     }
     
     [self sensorInit];

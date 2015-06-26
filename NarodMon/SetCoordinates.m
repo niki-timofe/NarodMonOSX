@@ -37,6 +37,8 @@
     [[self radiusField] setIntegerValue:[userDefaults integerForKey:@"Radius"]];
     
     [[self modeSwitcher] setState:[userDefaults boolForKey:@"SensorMode"]];
+    [[self periodVisualiser] setStringValue:[userDefaults stringForKey:@"UpdateInterval"]];
+    [[self periodSlider] setIntegerValue:[userDefaults integerForKey:@"UpdateInterval"]];
     [self modeChanged:[self modeSwitcher]];
     
     [[self window] setLevel:NSFloatingWindowLevel];
@@ -57,6 +59,15 @@
         [[self coordinatesLngField] setEnabled:YES];
         [[self sensorID] setEnabled:NO];
     }
+}
+
+- (IBAction)periodChanged:(NSSlider *)sender {
+    [userDefaults setInteger:[sender integerValue] forKey:@"UpdateInterval"];
+    [[self periodVisualiser] setIntegerValue:[sender integerValue]];
+}
+
+- (IBAction)helpBtnPress:(id)sender {
+    [NSApp orderFrontStandardAboutPanel:self];
 }
 
 - (IBAction)corrdinatesChanged:(NSTextField *)sender {
