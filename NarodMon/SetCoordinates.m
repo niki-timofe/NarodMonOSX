@@ -33,7 +33,7 @@
                                             floatForKey:@"CoordinatesLat"]];
     [[self coordinatesLngField] setFloatValue:[userDefaults
                                             floatForKey:@"CoordinatesLng"]];
-    [[self sensorID] setFloatValue:[userDefaults floatForKey:@"SensorID"]];
+    [[self sensorID] setIntegerValue:[userDefaults integerForKey:@"SensorID"]];
     [[self radiusField] setIntegerValue:[userDefaults integerForKey:@"Radius"]];
     
     [[self modeSwitcher] setState:[userDefaults boolForKey:@"SensorMode"]];

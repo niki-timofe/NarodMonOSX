@@ -91,11 +91,6 @@
                     <textField verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="zK5-Eb-JVA">
                         <rect key="frame" x="249" y="105" width="96" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" tag="2" placeholderString="22000" drawsBackground="YES" id="1hK-YK-uIl">
-                            <numberFormatter key="formatter" formatterBehavior="custom10_4" localizesFormat="NO" numberStyle="decimal" generatesDecimalNumbers="YES" allowsFloats="NO" usesGroupingSeparator="NO" lenient="YES" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" id="wFN-iy-jTh">
-                                <metadata>
-                                    <real key="inspectorSampleValue" value="56"/>
-                                </metadata>
-                            </numberFormatter>
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

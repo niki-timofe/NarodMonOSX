@@ -141,7 +141,7 @@ NSString *uuidStr;
             float tmp = 0;
             
             if ([userDefaults integerForKey:@"SensorID"] == 0) {
-                [userDefaults setInteger:[json[@"devices"][0][@"sensors"][0][@"id"] integerValue] forKey:@"SensorID"];
+                [userDefaults setInteger:[json[@"devices"][0][@"sensors"][0][@"id"] longValue] forKey:@"SensorID"];
             }
             
             for (int i = 0; i < [json[@"devices"] count]; i++) {
