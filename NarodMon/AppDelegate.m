@@ -116,6 +116,13 @@ NSString *uuidStr;
 
 - (void)update
 {
+    
+    timer = [NSTimer scheduledTimerWithTimeInterval:[userDefaults integerForKey:@"UpdateInterval"] * 60
+                                             target:self
+                                           selector:@selector(update)
+                                           userInfo:nil
+                                            repeats:YES];
+    
     [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
 }
 
