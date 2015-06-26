@@ -54,7 +54,6 @@
 		C5DBD7D3196173A200E96244 /* SetCoordinates.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetCoordinates.xib; sourceTree = "<group>"; };
 		C5E893B91B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C5E893BA1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ru; path = ru.lproj/Credits.rtf; sourceTree = "<group>"; };
-		C5E893BB1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		C5E893BC1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -333,7 +332,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				C5DBD7B11960C22000E96244 /* Base */,
-				C5E893BB1B33841D003F166B /* ru */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";

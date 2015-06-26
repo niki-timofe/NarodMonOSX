@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 
-
 NSString *const apiKey = @"40MHsctSKi4y6";
 NSMutableData *_responseData;
 NSTimer *timer;
@@ -90,8 +89,9 @@ NSString *uuidStr;
     } else {
         dictionary = [[NSMutableDictionary alloc] initWithDictionary:
                      @{@"cmd": @"sensorInfo",
-                       @"sensors":[NSArray
-                                   arrayWithObject:[userDefaults stringForKey:@"SensorID"]],
+                       @"sensors":[NSArray arrayWithObject:
+                                   [NSNumber numberWithInteger:
+                                    [userDefaults integerForKey:@"SensorID"]]],
                        @"uuid":uuidStr,
                        @"api_key":apiKey,
                        @"lang":@"ru"}];
@@ -132,6 +132,10 @@ NSString *uuidStr;
             float sum = 0;
             float count = 0;
             float tmp = 0;
+            
+            if ([userDefaults integerForKey:@"SensorID"] == 0) {
+                [userDefaults setInteger:[json[@"devices"][0][@"sensors"][0][@"id"] integerValue] forKey:@"SensorID"];
+            }
             
             for (int i = 0; i < [json[@"devices"] count]; i++) {
                 for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
@@ -205,7 +209,7 @@ NSString *uuidStr;
                                                userInfo:nil
                                                 repeats:YES];
         
-        appUpdate = [NSTimer scheduledTimerWithTimeInterval:1.5*60*60
+        appUpdate = [NSTimer scheduledTimerWithTimeInterval:2 * 60 * 60
                                                  target:self
                                                selector:@selector(sensorInit)
                                                userInfo:nil

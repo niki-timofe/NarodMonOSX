@@ -31,7 +31,8 @@ typedef NS_ENUM(NSUInteger, Type) {
 - (IBAction)updateBtnPress:(NSMenuItem *)sender;
 - (IBAction)setCoordinatesBtnPress:(NSMenuItem *)sender;
 
--(void)apiRequest:(NSDictionary*)dictionary;
+- (void)apiRequest:(NSDictionary*)dictionary;
+- (NSString *)serialNumber;
 
 @end
 

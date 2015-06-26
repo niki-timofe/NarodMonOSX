@@ -31,7 +31,7 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="5lX-fW-95b"/>
-                <menuItem title="Установить координаты" id="31u-6v-0qP">
+                <menuItem title="Настройки" id="31u-6v-0qP">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="setCoordinatesBtnPress:" target="Voe-Tx-rLC" id="93s-9w-xBY"/>
