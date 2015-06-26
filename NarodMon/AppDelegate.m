@@ -176,9 +176,9 @@ NSString *uuidStr;
         
     } else {
         
-        if (json[@"latest"] != [NSString stringWithFormat:@"%@",
-                               [[NSBundle mainBundle]
-                                objectForInfoDictionaryKey:@"CFBundleShortVersionString"]])
+        NSComparisonResult comparsion = [[NSString stringWithFormat:@"%@", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]] compare:json[@"latest"] options:NSNumericSearch];
+        
+        if (comparsion == NSOrderedAscending)
             {
                 NSAlert *alert = [[NSAlert alloc] init];
                 [alert addButtonWithTitle:@"Сейчас"];
@@ -192,6 +192,13 @@ NSString *uuidStr;
                     [NSApp terminate:self];
                 }
             }
+        
+        
+        
+        
+        
+        
+        
         
         if (![userDefaults objectForKey:@"Radius"]) {
             [userDefaults setInteger:0 forKey:@"Radius"];
