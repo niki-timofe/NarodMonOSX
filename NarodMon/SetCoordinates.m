@@ -83,8 +83,12 @@
                                 forKey:@"CoordinatesLng"];
                 break;
             case 2:
-                [userDefaults setFloat:[sender floatValue]
+                [userDefaults setInteger:[sender integerValue]
                                 forKey:@"SensorID"];
+                break;
+            case 3:
+                [userDefaults setInteger:[sender integerValue]
+                                forKey:@"Radius"];
                 break;
             default:
                 break;
