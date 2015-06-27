@@ -114,12 +114,12 @@ NSString *uuidStr;
     return nil;
 }
 
-- (void)update
+- (void)makeUpdate
 {
-    
-    timer = [NSTimer scheduledTimerWithTimeInterval:[userDefaults integerForKey:@"UpdateInterval"] * 60
+    timer = [NSTimer scheduledTimerWithTimeInterval:
+             [userDefaults integerForKey:@"UpdateInterval"] * 60
                                              target:self
-                                           selector:@selector(update)
+                                           selector:@selector(makeUpdate)
                                            userInfo:nil
                                             repeats:NO];
     
@@ -198,13 +198,7 @@ NSString *uuidStr;
                     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:json[@"url"]]];
                     [NSApp terminate:self];
                 }
-            }
-        
-        
-        
-        
-        
-        
+            }  
         
         
         if (![userDefaults objectForKey:@"Radius"]) {
@@ -216,13 +210,7 @@ NSString *uuidStr;
             [self openCoordsWindow];
         }
         
-        [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
-        
-        timer = [NSTimer scheduledTimerWithTimeInterval:[userDefaults integerForKey:@"UpdateInterval"] * 60
-                                                 target:self
-                                               selector:@selector(update)
-                                               userInfo:nil
-                                                repeats:YES];
+        [self makeUpdate];
         
         appUpdate = [NSTimer scheduledTimerWithTimeInterval:2 * 60 * 60
                                                  target:self
