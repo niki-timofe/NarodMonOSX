@@ -11,11 +11,10 @@
 NSString *const apiKey = @"40MHsctSKi4y6";
 NSMutableData *_responseData;
 NSTimer *timer;
-NSTimer *appUpdate;
 NSString *uuidStr;
-NSTimeInterval latestFetch;
-NSTimeInterval latestInit;
+NSTimeInterval latestFetch, latestInit;
 NSTimeInterval const sensorInitInterval = 2 * 60;
+BOOL isStandby = NO;
 
 @implementation NSString (MD5_Hash)
 
@@ -169,6 +168,8 @@ NSTimeInterval const sensorInitInterval = 2 * 60;
                                                        floatValue] withSign:1];
         }
         
+        isStandby = NO;
+        
         NSDateFormatter *formatter;
         NSString        *dateString;
         
@@ -225,7 +226,7 @@ NSTimeInterval const sensorInitInterval = 2 * 60;
 - (void)timerEvent {
     /*NSLog(@"Timer fired");*/
     
-    if (latestInit + sensorInitInterval * 60  < [[NSDate date] timeIntervalSince1970]) {
+    if ((latestInit + sensorInitInterval * 60  < [[NSDate date] timeIntervalSince1970]) || isStandby) {
         NSLog(@"Timer (init) fired");
         [self sensorInit];
     } else if (latestFetch + [userDefaults integerForKey:@"UpdateInterval"] * 60  < [[NSDate date] timeIntervalSince1970]) {
@@ -235,7 +236,10 @@ NSTimeInterval const sensorInitInterval = 2 * 60;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    [[NSAlert alertWithError:error] runModal];
+    if (!isStandby) {
+        [[NSAlert alertWithError:error] runModal];
+    }
+    isStandby = YES;
 }
 
 
@@ -325,6 +329,12 @@ NSTimeInterval const sensorInitInterval = 2 * 60;
     }
     
     [self sensorInit];
+    
+    timer = [NSTimer scheduledTimerWithTimeInterval: 5
+                                             target:self
+                                           selector:@selector(timerEvent)
+                                           userInfo:nil
+                                            repeats:YES];
     
     //self.statusBar.image =
     
