@@ -49,7 +49,7 @@ BOOL isStandby = NO;
 }
 
 - (IBAction)updateBtnPress:(NSMenuItem *)sender {
-    [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
+    [self sensorInit];
 }
 
 - (void)openCoordsWindow {
