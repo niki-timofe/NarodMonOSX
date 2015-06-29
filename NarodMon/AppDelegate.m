@@ -13,6 +13,9 @@ NSMutableData *_responseData;
 NSTimer *timer;
 NSTimer *appUpdate;
 NSString *uuidStr;
+NSTimeInterval latestFetch;
+NSTimeInterval latestInit;
+NSTimeInterval const sensorInitInterval = 2 * 60;
 
 @implementation NSString (MD5_Hash)
 
@@ -116,13 +119,7 @@ NSString *uuidStr;
 
 - (void)makeUpdate
 {
-    timer = [NSTimer scheduledTimerWithTimeInterval:
-             [userDefaults integerForKey:@"UpdateInterval"] * 60
-                                             target:self
-                                           selector:@selector(makeUpdate)
-                                           userInfo:nil
-                                            repeats:NO];
-    
+    latestFetch = [[NSDate date] timeIntervalSince1970];
     [self updateWithRadius:[userDefaults integerForKey:@"Radius"]];
 }
 
@@ -210,13 +207,30 @@ NSString *uuidStr;
             [self openCoordsWindow];
         }
         
-        [self makeUpdate];
+        if ([timer isValid]) {
+            [timer invalidate];
+            timer = nil;
+        }
         
-        appUpdate = [NSTimer scheduledTimerWithTimeInterval:2 * 60 * 60
+        timer = [NSTimer scheduledTimerWithTimeInterval: 5
                                                  target:self
-                                               selector:@selector(sensorInit)
+                                               selector:@selector(timerEvent)
                                                userInfo:nil
                                                 repeats:YES];
+        
+        [self makeUpdate];
+    }
+}
+
+- (void)timerEvent {
+    /*NSLog(@"Timer fired");*/
+    
+    if (latestInit + sensorInitInterval * 60  < [[NSDate date] timeIntervalSince1970]) {
+        NSLog(@"Timer (init) fired");
+        [self sensorInit];
+    } else if (latestFetch + [userDefaults integerForKey:@"UpdateInterval"] * 60  < [[NSDate date] timeIntervalSince1970]) {
+         NSLog(@"Timer (update) fired");
+        [self makeUpdate];
     }
 }
 
@@ -270,6 +284,8 @@ NSString *uuidStr;
 
 - (void)sensorInit
 {
+    latestInit = [[NSDate date] timeIntervalSince1970];
+    
     if ([userDefaults stringForKey:@"uuid"] != [self serialNumber]) {
         uuidStr = [self serialNumber];
         
