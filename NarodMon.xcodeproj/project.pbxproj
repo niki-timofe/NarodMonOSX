@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,10 +14,7 @@
 		C5DBD7AF1960C22000E96244 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7AE1960C22000E96244 /* AppDelegate.m */; };
 		C5DBD7B21960C22000E96244 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7B01960C22000E96244 /* MainMenu.xib */; };
 		C5DBD7B41960C22000E96244 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7B31960C22000E96244 /* Images.xcassets */; };
-		C5DBD7BB1960C22000E96244 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DBD7BA1960C22000E96244 /* XCTest.framework */; };
 		C5DBD7BC1960C22000E96244 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DBD79B1960C22000E96244 /* Cocoa.framework */; };
-		C5DBD7C41960C22000E96244 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7C21960C22000E96244 /* InfoPlist.strings */; };
-		C5DBD7C61960C22000E96244 /* NarodMonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7C51960C22000E96244 /* NarodMonTests.m */; };
 		C5DBD7D4196173A200E96244 /* SetCoordinates.m in Sources */ = {isa = PBXBuildFile; fileRef = C5DBD7D2196173A200E96244 /* SetCoordinates.m */; };
 		C5DBD7D5196173A200E96244 /* SetCoordinates.xib in Resources */ = {isa = PBXBuildFile; fileRef = C5DBD7D3196173A200E96244 /* SetCoordinates.xib */; };
 /* End PBXBuildFile section */
@@ -46,15 +43,11 @@
 		C5DBD7B11960C22000E96244 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		C5DBD7B31960C22000E96244 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		C5DBD7B91960C22000E96244 /* NarodMonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NarodMonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C5DBD7BA1960C22000E96244 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		C5DBD7C11960C22000E96244 /* NarodMonTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NarodMonTests-Info.plist"; sourceTree = "<group>"; };
-		C5DBD7C51960C22000E96244 /* NarodMonTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NarodMonTests.m; sourceTree = "<group>"; };
 		C5DBD7D1196173A200E96244 /* SetCoordinates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetCoordinates.h; sourceTree = "<group>"; };
 		C5DBD7D2196173A200E96244 /* SetCoordinates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SetCoordinates.m; sourceTree = "<group>"; };
 		C5DBD7D3196173A200E96244 /* SetCoordinates.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetCoordinates.xib; sourceTree = "<group>"; };
 		C5E893B91B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C5E893BA1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = ru; path = ru.lproj/Credits.rtf; sourceTree = "<group>"; };
-		C5E893BC1B33841D003F166B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,7 +64,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5DBD7BC1960C22000E96244 /* Cocoa.framework in Frameworks */,
-				C5DBD7BB1960C22000E96244 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,7 +74,6 @@
 			isa = PBXGroup;
 			children = (
 				C5DBD7A11960C22000E96244 /* NarodMon */,
-				C5DBD7BF1960C22000E96244 /* NarodMonTests */,
 				C5DBD79A1960C22000E96244 /* Frameworks */,
 				C5DBD7991960C22000E96244 /* Products */,
 			);
@@ -101,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				C5DBD79B1960C22000E96244 /* Cocoa.framework */,
-				C5DBD7BA1960C22000E96244 /* XCTest.framework */,
 				C5DBD79D1960C22000E96244 /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -138,24 +128,6 @@
 				C5DBD7A71960C22000E96244 /* main.m */,
 				C5DBD7A91960C22000E96244 /* NarodMon-Prefix.pch */,
 				C5DBD7AA1960C22000E96244 /* Credits.rtf */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		C5DBD7BF1960C22000E96244 /* NarodMonTests */ = {
-			isa = PBXGroup;
-			children = (
-				C5DBD7C51960C22000E96244 /* NarodMonTests.m */,
-				C5DBD7C01960C22000E96244 /* Supporting Files */,
-			);
-			path = NarodMonTests;
-			sourceTree = "<group>";
-		};
-		C5DBD7C01960C22000E96244 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				C5DBD7C11960C22000E96244 /* NarodMonTests-Info.plist */,
-				C5DBD7C21960C22000E96244 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -215,7 +187,7 @@
 		C5DBD7901960C21F00E96244 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Тимофеев Никита";
 				TargetAttributes = {
 					C5DBD7B81960C22000E96244 = {
@@ -224,7 +196,7 @@
 				};
 			};
 			buildConfigurationList = C5DBD7931960C21F00E96244 /* Build configuration list for PBXProject "NarodMon" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -259,7 +231,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C5DBD7C41960C22000E96244 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +268,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C5DBD7C61960C22000E96244 /* NarodMonTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,14 +306,6 @@
 			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
-		C5DBD7C21960C22000E96244 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C5E893BC1B33841D003F166B /* ru */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -364,6 +326,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -379,7 +342,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -412,7 +375,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -425,6 +388,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NarodMon/NarodMon-Prefix.pch";
 				INFOPLIST_FILE = "NarodMon/NarodMon-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -438,6 +402,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NarodMon/NarodMon-Prefix.pch";
 				INFOPLIST_FILE = "NarodMon/NarodMon-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -459,6 +424,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "NarodMonTests/NarodMonTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -477,6 +443,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NarodMon/NarodMon-Prefix.pch";
 				INFOPLIST_FILE = "NarodMonTests/NarodMonTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
