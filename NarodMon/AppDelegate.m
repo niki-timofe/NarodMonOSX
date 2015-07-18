@@ -169,6 +169,7 @@ BOOL isStandby = NO;
         }
         
         isStandby = NO;
+        [self.statusBar.button setAppearsDisabled:NO];
         
         NSDateFormatter *formatter;
         NSString        *dateString;
@@ -200,7 +201,7 @@ BOOL isStandby = NO;
         
         
         if (![userDefaults objectForKey:@"Radius"]) {
-            [userDefaults setInteger:0 forKey:@"Radius"];
+            [userDefaults setInteger:1 forKey:@"Radius"];
         }
         if (![userDefaults objectForKey:@"CoordinatesLat"]) {
             [userDefaults setFloat:[json[@"lat"] floatValue]  forKey:@"CoordinatesLat"];
@@ -224,22 +225,16 @@ BOOL isStandby = NO;
 }
 
 - (void)timerEvent {
-    /*NSLog(@"Timer fired");*/
-    
     if ((latestInit + sensorInitInterval * 60  < [[NSDate date] timeIntervalSince1970]) || isStandby) {
-        NSLog(@"Timer (init) fired");
         [self sensorInit];
     } else if (latestFetch + [userDefaults integerForKey:@"UpdateInterval"] * 60  < [[NSDate date] timeIntervalSince1970]) {
-         NSLog(@"Timer (update) fired");
         [self makeUpdate];
     }
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if (!isStandby) {
-        [[NSAlert alertWithError:error] runModal];
-    }
     isStandby = YES;
+    [self.statusBar.button setAppearsDisabled:YES];
 }
 
 
