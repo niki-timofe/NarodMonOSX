@@ -16,6 +16,7 @@ NSTimeInterval latestFetch, latestInit;
 NSTimeInterval const sensorInitInterval = 2 * 60;
 BOOL isStandby = NO;
 CLLocationManager *locationManager;
+CLLocation *curPos;
 
 @implementation NSString (MD5_Hash)
 
@@ -65,6 +66,19 @@ CLLocationManager *locationManager;
     [self openCoordsWindow];
 }
 
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    curPos = [locations objectAtIndex:0];
+    [locationManager stopUpdatingLocation];
+    
+}
+
+-(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    curPos = newLocation;
+    [locationManager stopUpdatingLocation];
+}
+
 - (void)updateWithRadius:(NSInteger)radius
 {
     NSMutableDictionary *dictionary;
@@ -75,7 +89,7 @@ CLLocationManager *locationManager;
                 [self initCL];
             }
             
-            CLLocation *curPos = locationManager.location;
+            [locationManager startUpdatingLocation];
             
             if (curPos) {
                 [userDefaults setFloat:[[NSNumber numberWithDouble:curPos.coordinate.latitude] floatValue] forKey:@"CoordinatesLat"];
@@ -325,7 +339,6 @@ CLLocationManager *locationManager;
         locationManager = [[CLLocationManager alloc] init];
         [locationManager setDelegate:self];
         [locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
-        [locationManager startUpdatingLocation];
     }
 }
 
