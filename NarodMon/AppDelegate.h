@@ -9,12 +9,13 @@
 #import <Cocoa/Cocoa.h>
 #import <CommonCrypto/CommonDigest.h>
 #import "SetCoordinates.h"
+#import <CoreLocation/CoreLocation.h>
 
 extern NSString* const apiKey;
 
 NSUserDefaults *userDefaults;
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, CLLocationManagerDelegate>
 {
     SetCoordinates *coordsWindow;
 }

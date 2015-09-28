@@ -15,6 +15,7 @@ NSString *uuidStr;
 NSTimeInterval latestFetch, latestInit;
 NSTimeInterval const sensorInitInterval = 2 * 60;
 BOOL isStandby = NO;
+CLLocationManager *locationManager;
 
 @implementation NSString (MD5_Hash)
 
@@ -69,6 +70,19 @@ BOOL isStandby = NO;
     NSMutableDictionary *dictionary;
     
     if (![userDefaults boolForKey:@"SensorMode"]) {
+        if ([userDefaults boolForKey:@"GeoMode"]) {
+            if (locationManager == nil) {
+                [self initCL];
+            }
+            
+            CLLocation *curPos = locationManager.location;
+            
+            if (curPos) {
+                [userDefaults setFloat:[[NSNumber numberWithDouble:curPos.coordinate.latitude] floatValue] forKey:@"CoordinatesLat"];
+                [userDefaults setFloat:[[NSNumber numberWithDouble:curPos.coordinate.longitude] floatValue] forKey:@"CoordinatesLng"];
+            }
+        }
+        
         float lat = [userDefaults floatForKey:@"CoordinatesLat"];
         float lng = [userDefaults floatForKey:@"CoordinatesLng"];
         
@@ -305,6 +319,16 @@ BOOL isStandby = NO;
                        @"api_key":apiKey,}];
 }
 
+- (void)initCL
+{
+    if ([userDefaults boolForKey:@"GeoMode"]) {
+        locationManager = [[CLLocationManager alloc] init];
+        [locationManager setDelegate:self];
+        [locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
+        [locationManager startUpdatingLocation];
+    }
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     self.statusBar = [[NSStatusBar systemStatusBar]
@@ -322,7 +346,11 @@ BOOL isStandby = NO;
     if (![userDefaults objectForKey:@"UpdateInterval"]) {
         [userDefaults setObject:@3 forKey:@"UpdateInterval"];
     }
+    if (![userDefaults objectForKey:@"GeoMode"]) {
+        [userDefaults setBool:NO forKey:@"GeoMode"];
+    }
     
+    [self initCL];
     [self sensorInit];
     
     timer = [NSTimer scheduledTimerWithTimeInterval: 5

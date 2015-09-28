@@ -21,6 +21,7 @@ NSUserDefaults *userDefaults;
 @property (weak) IBOutlet NSButton *modeSwitcher;
 @property (weak) IBOutlet NSTextField *radiusField;
 @property (weak) IBOutlet NSSlider *periodSlider;
+@property (weak) IBOutlet NSButton *geolocationModeSwitcher;
 @property (weak) IBOutlet NSTextField *periodVisualiser;
 
 @end

@@ -37,6 +37,7 @@
     [[self radiusField] setIntegerValue:[userDefaults integerForKey:@"Radius"]];
     
     [[self modeSwitcher] setState:[userDefaults boolForKey:@"SensorMode"]];
+    [[self geolocationModeSwitcher] setState:[userDefaults boolForKey:@"GeoMode"]];
     [[self periodVisualiser] setStringValue:[userDefaults stringForKey:@"UpdateInterval"]];
     [[self periodSlider] setIntegerValue:[userDefaults integerForKey:@"UpdateInterval"]];
     [self modeChanged:[self modeSwitcher]];
@@ -48,16 +49,31 @@
 - (IBAction)modeChanged:(NSButton *)sender {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
-    if ([sender state] == NSOnState) {
-        [userDefaults setBool:YES forKey:@"SensorMode"];
-        [[self coordinatesField] setEnabled:NO];
-        [[self coordinatesLngField] setEnabled:NO];
-        [[self sensorID] setEnabled:YES];
+    if ([sender tag] != 1) {
+        if ([sender state] == NSOnState) {
+            [userDefaults setBool:YES forKey:@"SensorMode"];
+            [[self coordinatesField] setEnabled:NO];
+            [[self coordinatesLngField] setEnabled:NO];
+            [[self geolocationModeSwitcher] setState:NO];
+            [userDefaults setBool:NO forKey:@"GeoMode"];
+            [[self sensorID] setEnabled:YES];
+        } else {
+            [userDefaults setBool:NO forKey:@"SensorMode"];
+            [[self coordinatesField] setEnabled:YES];
+            [[self coordinatesLngField] setEnabled:YES];
+            [[self sensorID] setEnabled:NO];
+        }
     } else {
-        [userDefaults setBool:NO forKey:@"SensorMode"];
-        [[self coordinatesField] setEnabled:YES];
-        [[self coordinatesLngField] setEnabled:YES];
-        [[self sensorID] setEnabled:NO];
+        if ([sender state] == NSOnState) {
+            [userDefaults setBool:NO forKey:@"SensorMode"];
+            [[self coordinatesField] setEnabled:YES];
+            [[self coordinatesLngField] setEnabled:YES];
+            [[self modeSwitcher] setState:NO];
+            [userDefaults setBool:YES forKey:@"GeoMode"];
+        } else {
+            [userDefaults setBool:NO forKey:@"GeoMode"];
+            [[self sensorID] setEnabled:NO];
+        }
     }
 }
 
@@ -68,6 +84,9 @@
 
 - (IBAction)helpBtnPress:(id)sender {
     [NSApp orderFrontStandardAboutPanel:self];
+}
+
+- (IBAction)geolocationModeChanged:(NSButton *)sender {
 }
 
 - (IBAction)corrdinatesChanged:(NSTextField *)sender {
