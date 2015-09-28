@@ -28,6 +28,8 @@ typedef NS_ENUM(NSUInteger, Type) {
 @property (weak) IBOutlet NSMenu *statusMenu;
 @property (weak) IBOutlet NSMenuItem *latestUpdateTime;
 
+@property (strong, nonatomic) CLLocationManager *locationManager;
+
 - (NSString*)formatOutput:(float)value withSign:(Type)sign;
 - (IBAction)updateBtnPress:(NSMenuItem *)sender;
 - (IBAction)setCoordinatesBtnPress:(NSMenuItem *)sender;

@@ -29,10 +29,18 @@
     
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [[self window] setLevel:NSFloatingWindowLevel];
+}
+
+- (IBAction)showWindow:(id)sender
+{
+    [super showWindow:sender];
+    
     [[self coordinatesField] setFloatValue:[userDefaults
                                             floatForKey:@"CoordinatesLat"]];
     [[self coordinatesLngField] setFloatValue:[userDefaults
-                                            floatForKey:@"CoordinatesLng"]];
+                                               floatForKey:@"CoordinatesLng"]];
     [[self sensorID] setIntegerValue:[userDefaults integerForKey:@"SensorID"]];
     [[self radiusField] setIntegerValue:[userDefaults integerForKey:@"Radius"]];
     
@@ -41,9 +49,6 @@
     [[self periodVisualiser] setStringValue:[userDefaults stringForKey:@"UpdateInterval"]];
     [[self periodSlider] setIntegerValue:[userDefaults integerForKey:@"UpdateInterval"]];
     [self modeChanged:[self modeSwitcher]];
-    
-    [[self window] setLevel:NSFloatingWindowLevel];
-    
 }
 
 - (IBAction)modeChanged:(NSButton *)sender {

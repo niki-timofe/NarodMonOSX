@@ -15,7 +15,6 @@ NSString *uuidStr;
 NSTimeInterval latestFetch, latestInit;
 NSTimeInterval const sensorInitInterval = 2 * 60;
 BOOL isStandby = NO;
-CLLocationManager *locationManager;
 CLLocation *curPos;
 
 @implementation NSString (MD5_Hash)
@@ -66,17 +65,15 @@ CLLocation *curPos;
     [self openCoordsWindow];
 }
 
--(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    curPos = [locations objectAtIndex:0];
-    [locationManager stopUpdatingLocation];
-    
+    curPos = [locations lastObject];
+    [[self locationManager] stopUpdatingLocation];
 }
 
--(void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    curPos = newLocation;
-    [locationManager stopUpdatingLocation];
+    NSLog(@"%@", error);
 }
 
 - (void)updateWithRadius:(NSInteger)radius
@@ -85,11 +82,11 @@ CLLocation *curPos;
     
     if (![userDefaults boolForKey:@"SensorMode"]) {
         if ([userDefaults boolForKey:@"GeoMode"]) {
-            if (locationManager == nil) {
+            if ([self locationManager] == nil) {
                 [self initCL];
             }
             
-            [locationManager startUpdatingLocation];
+            [[self locationManager] startUpdatingLocation];
             
             if (curPos) {
                 [userDefaults setFloat:[[NSNumber numberWithDouble:curPos.coordinate.latitude] floatValue] forKey:@"CoordinatesLat"];
@@ -336,9 +333,9 @@ CLLocation *curPos;
 - (void)initCL
 {
     if ([userDefaults boolForKey:@"GeoMode"]) {
-        locationManager = [[CLLocationManager alloc] init];
-        [locationManager setDelegate:self];
-        [locationManager setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
+        self.locationManager = [[CLLocationManager alloc] init];
+        [[self locationManager] setDelegate:self];
+        [[self locationManager] setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
     }
 }
 
