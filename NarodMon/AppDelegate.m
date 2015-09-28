@@ -73,7 +73,7 @@ BOOL isStandby = NO;
         float lng = [userDefaults floatForKey:@"CoordinatesLng"];
         
         dictionary = [[NSMutableDictionary alloc] initWithDictionary:
-                     @{@"cmd": @"sensorNear",
+                     @{@"cmd": @"sensorsNearby",
                        @"lat":[NSNumber numberWithFloat:lat],
                        @"lng":[NSNumber numberWithFloat:lng],
                        @"uuid":uuidStr,
@@ -90,7 +90,7 @@ BOOL isStandby = NO;
         
     } else {
         dictionary = [[NSMutableDictionary alloc] initWithDictionary:
-                     @{@"cmd": @"sensorInfo",
+                     @{@"cmd": @"sensorsValues",
                        @"sensors":[NSArray arrayWithObject:
                                    [NSNumber numberWithInteger:
                                     [userDefaults integerForKey:@"SensorID"]]],
@@ -295,7 +295,7 @@ BOOL isStandby = NO;
     
     uuidStr = [NSString md5:uuidStr];
     
-    [self apiRequest:@{@"cmd":@"sensorInit",
+    [self apiRequest:@{@"cmd":@"appInit",
                        @"version":[NSString stringWithFormat:@"%@",
                                    [[NSBundle mainBundle]
                                     objectForInfoDictionaryKey:@"CFBundleShortVersionString"]],
