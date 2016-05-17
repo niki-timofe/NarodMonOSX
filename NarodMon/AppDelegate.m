@@ -276,6 +276,7 @@ CLLocation *curPos;
                                                         URLWithString:@"http://narodmon.ru/client.php"]];
         
         [request setHTTPMethod:@"POST"];
+        [request setValue:@"NarodMon OS X Client" forHTTPHeaderField:@"User-Agent"];
         
         [request setHTTPBody:jsonData];
         (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
