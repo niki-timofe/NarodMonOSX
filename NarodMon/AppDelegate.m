@@ -67,17 +67,20 @@ CLLocation *curPos;
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
+    NSLog(@"Getting location successfull");
     curPos = [locations lastObject];
     [[self locationManager] stopUpdatingLocation];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    NSLog(@"%@", error);
+    NSLog(@"CoreLocation error: %@", error);
 }
 
 - (void)updateWithRadius:(NSInteger)radius
 {
+    NSLog(@"Trying to update with radius %li", (long)radius);
+    
     NSMutableDictionary *dictionary;
     
     if (![userDefaults boolForKey:@"SensorMode"]) {
@@ -181,8 +184,10 @@ CLLocation *curPos;
                 }
             }
             
-            if  (count == 0) {
-                [self updateWithRadius:0];
+            if  (count == 0 && [userDefaults integerForKey:@"Radius"] != 0) {
+                [userDefaults setInteger:0 forKey:@"Radius"];
+                [self makeUpdate];
+                return;
             }
             
             self.statusBar.title = [self
@@ -239,7 +244,7 @@ CLLocation *curPos;
             timer = nil;
         }
         
-        timer = [NSTimer scheduledTimerWithTimeInterval: 5
+        timer = [NSTimer scheduledTimerWithTimeInterval:11
                                                  target:self
                                                selector:@selector(timerEvent)
                                                userInfo:nil
@@ -250,6 +255,7 @@ CLLocation *curPos;
 }
 
 - (void)timerEvent {
+    NSLog(@"Timer fired");
     if ((latestInit + sensorInitInterval * 60  < [[NSDate date] timeIntervalSince1970]) || isStandby) {
         [self sensorInit];
     } else if (latestFetch + [userDefaults integerForKey:@"UpdateInterval"] * 60  < [[NSDate date] timeIntervalSince1970]) {
@@ -258,6 +264,7 @@ CLLocation *curPos;
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSLog(@"Sending request failed: %@", error);
     isStandby = YES;
     [self.statusBar.button setAppearsDisabled:YES];
 }
@@ -279,17 +286,15 @@ CLLocation *curPos;
         [request setValue:@"NarodMon OS X Client" forHTTPHeaderField:@"User-Agent"];
         
         [request setHTTPBody:jsonData];
+        NSLog(@"Sending request...");
         (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
-    } else {
     }
 }
 
 - (NSString *)serialNumber
 {
-    io_service_t    platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault,
-                                                                 
-                                                                 IOServiceMatching("IOPlatformExpertDevice"));
-    CFStringRef serialNumberAsCFString = NULL;
+    io_service_t    platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
+    CFStringRef     serialNumberAsCFString = NULL;
     
     if (platformExpert) {
         serialNumberAsCFString = IORegistryEntryCreateCFProperty(platformExpert,
@@ -309,6 +314,7 @@ CLLocation *curPos;
 
 - (void)sensorInit
 {
+    NSLog(@"API initialisation begin...");
     latestInit = [[NSDate date] timeIntervalSince1970];
     
     if ([userDefaults stringForKey:@"uuid"] != [self serialNumber]) {
@@ -321,6 +327,7 @@ CLLocation *curPos;
     
     uuidStr = [NSString md5:uuidStr];
     
+    NSLog(@"Trying to init api for UUID: %@", uuidStr);
     [self apiRequest:@{@"cmd":@"appInit",
                        @"version":[NSString stringWithFormat:@"%@",
                                    [[NSBundle mainBundle]
@@ -334,19 +341,24 @@ CLLocation *curPos;
 - (void)initCL
 {
     if ([userDefaults boolForKey:@"GeoMode"]) {
+        NSLog(@"Initialising CoreLocation...");
         self.locationManager = [[CLLocationManager alloc] init];
         [[self locationManager] setDelegate:self];
         [[self locationManager] setDesiredAccuracy:kCLLocationAccuracyHundredMeters];
+        NSLog(@"CoreLocation initialised");
     }
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    NSLog(@"ApplicationDidFinishLaunching:");
+    NSLog(@"Creating statusItem...");
     self.statusBar = [[NSStatusBar systemStatusBar]
                       statusItemWithLength:NSVariableStatusItemLength];
     
     self.statusBar.title = [self formatOutput:0 withSign:DEGREES];
     
+    NSLog(@"Initialisation of UserDefaults...");
     userDefaults = [NSUserDefaults standardUserDefaults];
     
     if (![userDefaults objectForKey:@"SensorID"]) {
@@ -369,8 +381,6 @@ CLLocation *curPos;
                                            selector:@selector(timerEvent)
                                            userInfo:nil
                                             repeats:YES];
-    
-    //self.statusBar.image =
     
     self.statusBar.menu = self.statusMenu;
     self.statusBar.highlightMode = YES;
