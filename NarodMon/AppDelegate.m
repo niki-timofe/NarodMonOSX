@@ -184,8 +184,10 @@ CLLocation *curPos;
                 }
             }
             
-            if  (count == 0) {
-                [self updateWithRadius:0];
+            if  (count == 0 && [userDefaults integerForKey:@"Radius"] != 0) {
+                [userDefaults setInteger:0 forKey:@"Radius"];
+                [self makeUpdate];
+                return;
             }
             
             self.statusBar.title = [self
@@ -242,7 +244,7 @@ CLLocation *curPos;
             timer = nil;
         }
         
-        timer = [NSTimer scheduledTimerWithTimeInterval: 5
+        timer = [NSTimer scheduledTimerWithTimeInterval:11
                                                  target:self
                                                selector:@selector(timerEvent)
                                                userInfo:nil
