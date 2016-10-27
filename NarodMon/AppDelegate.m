@@ -163,11 +163,6 @@ CLLocation *curPos;
         float count = 0;
         float tmp = 0;
         
-        if ([userDefaults integerForKey:@"SensorID"] == 0) {
-            [userDefaults setInteger:[json[@"devices"][0][@"sensors"][0][@"id"] longValue]
-                              forKey:@"SensorID"];
-        }
-        
         for (int i = 0; i < [json[@"devices"] count]; i++) {
             for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
                 
@@ -188,6 +183,13 @@ CLLocation *curPos;
             [userDefaults setInteger:0 forKey:@"Radius"];
             [self makeUpdate];
             return;
+        }
+        
+        if (count != 0) {
+            if ([userDefaults integerForKey:@"SensorID"] == 0) {
+                [userDefaults setInteger:[json[@"devices"][0][@"sensors"][0][@"id"] longValue]
+                                  forKey:@"SensorID"];
+            }
         }
         
         self.statusBar.title = [self
