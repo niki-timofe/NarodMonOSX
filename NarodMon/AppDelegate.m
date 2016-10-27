@@ -158,45 +158,41 @@ CLLocation *curPos;
                                  error: &error];
     
     if (!json[@"latest"]) {
-        if (![userDefaults boolForKey:@"SensorMode"]) {
-            float min = FLT_MAX;
-            float sum = 0;
-            float count = 0;
-            float tmp = 0;
-            
-            if ([userDefaults integerForKey:@"SensorID"] == 0) {
-                [userDefaults setInteger:[json[@"devices"][0][@"sensors"][0][@"id"] longValue] forKey:@"SensorID"];
-            }
-            
-            for (int i = 0; i < [json[@"devices"] count]; i++) {
-                for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
+        float min = FLT_MAX;
+        float sum = 0;
+        float count = 0;
+        float tmp = 0;
+        
+        if ([userDefaults integerForKey:@"SensorID"] == 0) {
+            [userDefaults setInteger:[json[@"devices"][0][@"sensors"][0][@"id"] longValue]
+                              forKey:@"SensorID"];
+        }
+        
+        for (int i = 0; i < [json[@"devices"] count]; i++) {
+            for (int ii = 0; ii < [json[@"devices"][i][@"sensors"] count]; ii++) {
+                
+                if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1) {
+                    tmp = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
                     
-                    if ([json[@"devices"][i][@"sensors"][ii][@"type"] floatValue] == 1) {
-                        tmp = [json[@"devices"][i][@"sensors"][ii][@"value"] floatValue];
-                        
-                        sum += tmp;
-                        count++;
-                        
-                        if (min > tmp) {
-                            min = tmp;
-                        }
+                    sum += tmp;
+                    count++;
+                    
+                    if (min > tmp) {
+                        min = tmp;
                     }
                 }
             }
-            
-            if  (count == 0 && [userDefaults integerForKey:@"Radius"] != 0) {
-                [userDefaults setInteger:0 forKey:@"Radius"];
-                [self makeUpdate];
-                return;
-            }
-            
-            self.statusBar.title = [self
-                                    formatOutput:((min + (min + sum / count) / 2) / 2)
-                                    withSign:1];
-        } else {
-            self.statusBar.title = [self formatOutput:[json[@"sensors"][0][@"value"]
-                                                       floatValue] withSign:1];
         }
+        
+        if  (count == 0 && [userDefaults integerForKey:@"Radius"] != 0) {
+            [userDefaults setInteger:0 forKey:@"Radius"];
+            [self makeUpdate];
+            return;
+        }
+        
+        self.statusBar.title = [self
+                                formatOutput:((min + (min + sum / count) / 2) / 2)
+                                withSign:1];
         
         isStandby = NO;
         [self.statusBar.button setAppearsDisabled:NO];
