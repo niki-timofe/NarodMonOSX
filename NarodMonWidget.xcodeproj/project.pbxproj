@@ -42,7 +42,6 @@
 			children = (
 				11A4E66E1DC24A0B001470BF /* NarodMonWidget */,
 				11A4E66D1DC24A0B001470BF /* Products */,
-				11A4E6821DC264FF001470BF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -67,13 +66,6 @@
 				11A4E6851DC2FB73001470BF /* NarodMonWidget-Bridging-Header.h */,
 			);
 			path = NarodMonWidget;
-			sourceTree = "<group>";
-		};
-		11A4E6821DC264FF001470BF /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -340,6 +332,7 @@
 				11A4E67B1DC24A0B001470BF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
