@@ -16,13 +16,13 @@ struct App {
 }
 
 struct Sensor {
-    let id: UInt8
+    let id: UInt
     let type: Type
 }
 
 struct Reading {
     let value: Float
-    let type: Type
+    let sensor: UInt
     let time: UInt
 }
 
@@ -35,10 +35,12 @@ struct Type {
 protocol NarodMonAPIDelegate {
     func appInitiated(app: App)
     func gotSensorsValues(rdgs: [Reading])
+    func gotSensorsList(sensors: [Sensor])
 }
 
 class NarodMonAPI {
     let API_KEY = "40MHsctSKi4y6"
+    var types: [Type] = []
     
     var delegate: NarodMonAPIDelegate?
     
@@ -76,7 +78,7 @@ class NarodMonAPI {
     
     func toJSONData(dict: [String:Any]) -> Data? {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+            let jsonData = try JSONSerialization.data(withJSONObject: dict)
             return jsonData
         } catch {
             print(error.localizedDescription)
@@ -93,6 +95,12 @@ class NarodMonAPI {
         } catch {
             print("JSON parsing failed: \(error)")
             return nil
+        }
+        
+        types = []
+        
+        for type in json["types"] as! [[String:Any]] {
+            types.append(Type(id: type["type"] as! UInt8, name: type["name"] as! String, unit: type["unit"] as! String))
         }
         
         return App(lat: json["lat"] as! Float,
@@ -126,6 +134,50 @@ class NarodMonAPI {
         task.resume()
     }
     
+    func sensorsFromSensorsNearby(data: Data) -> [Sensor]? {
+        typealias JSONDict = [String:Any]
+        let json: JSONDict
+        
+        do {
+            json = try JSONSerialization.jsonObject(with: data,
+                                                    options: []) as! JSONDict
+        } catch {
+            print("JSON parsing failed: \(error)")
+            return nil
+        }
+        
+        var senss: [Sensor] = []
+        for device in json["devices"] as! [[String:Any]] {
+            for sensor in device["sensors"] as! [[String:Any]] {
+                senss.append(Sensor(id: sensor["id"] as! UInt, type: self.types[sensor["type"] as! Int]))
+            }
+        }
+        
+        return senss
+    }
+    
+    func sensorsNearby() {
+        let postObject = ["cmd": "sensorsNearby",
+                          "uuid": uuid(),
+                          "pub": 1,
+                          "limit": 3,
+                          "api_key": API_KEY] as [String:Any]
+        request.httpBody = toJSONData(dict: postObject)
+        
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); return}
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("response = \(response)")
+                return
+            }
+            
+            if let sensors = self.sensorsFromSensorsNearby(data: data) {
+                self.delegate?.gotSensorsList(sensors: sensors)
+            }
+        }
+        task.resume()
+    }
+    
     func valuesFromSensorsValues(data: Data) -> [Reading]? {
         typealias JSONDict = [String:Any]
         let json: JSONDict
@@ -141,14 +193,14 @@ class NarodMonAPI {
         var readings: [Reading] = []
         for sensor in json["sensors"] as! [[String:Any]] {
             readings.append(Reading(value: sensor["value"] as! Float,
-                                    type: Type(id: 0, name: "Число", unit: ""),
+                                    sensor: sensor["id"] as! UInt,
                                     time: sensor["time"] as! UInt))
         }
         
         return readings
     }
     
-    func sensorsValues(sensors: [Int8]) {
+    func sensorsValues(sensors: [UInt]) {
         let postObject = ["cmd": "sensorsValues",
                           "uuid": uuid(),
                           "api_key": API_KEY,
