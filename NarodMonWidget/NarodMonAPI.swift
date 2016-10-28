@@ -15,8 +15,26 @@ struct App {
     let url: String
 }
 
+struct Sensor {
+    let id: UInt8
+    let type: Type
+}
+
+struct Reading {
+    let value: Float
+    let type: Type
+    let time: UInt
+}
+
+struct Type {
+    let id: UInt8
+    let name: String
+    let unit: String
+}
+
 protocol NarodMonAPIDelegate {
     func appInitiated(app: App)
+    func gotSensorsValues(rdgs: [Reading])
 }
 
 class NarodMonAPI {
@@ -26,6 +44,7 @@ class NarodMonAPI {
     
     init(delegate: NarodMonAPIDelegate) {
         self.delegate = delegate
+        self.appInit()
     }
     
     var request = URLRequest(url: URL(string: "https://narodmon.ru/api")!)
@@ -55,7 +74,7 @@ class NarodMonAPI {
         return MD5(string: uuid!)
     }
     
-    func toJSONData(dict: [String:String]) -> Data? {
+    func toJSONData(dict: [String:Any]) -> Data? {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
             return jsonData
@@ -65,8 +84,8 @@ class NarodMonAPI {
         return nil
     }
     
-    func locationFromAppInit(data: Data) -> App? {
-        typealias JSONDict = [String:AnyObject]
+    func appFromAppInit(data: Data) -> App? {
+        typealias JSONDict = [String:Any]
         let json: JSONDict
         
         do {
@@ -76,16 +95,22 @@ class NarodMonAPI {
             return nil
         }
         
-        print(json)
-        return App(lat: json["lat"] as! Float, lng: json["lng"] as! Float, latest: json["latest"] as! String, url: json["url"] as! String)
+        return App(lat: json["lat"] as! Float,
+                   lng: json["lng"] as! Float,
+                   latest: json["latest"] as! String,
+                   url: json["url"] as! String)
     }
     
-    func appInit() -> Void {
+    func appInit() {
         request.httpMethod = "POST"
         let osVersion = ProcessInfo().operatingSystemVersion
-        let postObject = ["cmd": "appInit", "uuid": uuid(), "api_key": API_KEY, "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String, "lang": "ru", "platform": String(format: "%d.%d.%d", osVersion.majorVersion, osVersion.minorVersion, osVersion.patchVersion)]
-        let postData = toJSONData(dict: postObject)
-        request.httpBody = postData
+        let postObject = ["cmd": "appInit",
+                          "uuid": uuid(),
+                          "api_key": API_KEY,
+                          "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String,
+                          "lang": "ru",
+                          "platform": String(format: "%d.%d.%d", osVersion.majorVersion, osVersion.minorVersion, osVersion.patchVersion)] as [String : Any]
+        request.httpBody = toJSONData(dict: postObject)
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); return}
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
@@ -94,12 +119,54 @@ class NarodMonAPI {
                 return
             }
             
-            if let app = self.locationFromAppInit(data: data) {
+            if let app = self.appFromAppInit(data: data) {
                 self.delegate?.appInitiated(app: app)
             }
         }
         task.resume()
     }
     
+    func valuesFromSensorsValues(data: Data) -> [Reading]? {
+        typealias JSONDict = [String:Any]
+        let json: JSONDict
+        
+        do {
+            json = try JSONSerialization.jsonObject(with: data,
+                                                    options: []) as! JSONDict
+        } catch {
+            print("JSON parsing failed: \(error)")
+            return nil
+        }
+        
+        var readings: [Reading] = []
+        for sensor in json["sensors"] as! [[String:Any]] {
+            readings.append(Reading(value: sensor["value"] as! Float,
+                                    type: Type(id: 0, name: "Число", unit: ""),
+                                    time: sensor["time"] as! UInt))
+        }
+        
+        return readings
+    }
+    
+    func sensorsValues(sensors: [Int8]) {
+        let postObject = ["cmd": "sensorsValues",
+                          "uuid": uuid(),
+                          "api_key": API_KEY,
+                          "sensors": sensors] as [String : Any]
+        request.httpBody = toJSONData(dict: postObject)
+        
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); return}
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
+                print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                print("response = \(response)")
+                return
+            }
+            
+            if let rdgs = self.valuesFromSensorsValues(data: data) {
+                self.delegate?.gotSensorsValues(rdgs: rdgs)
+            }
+        }
+        task.resume()
+    }
     
 }

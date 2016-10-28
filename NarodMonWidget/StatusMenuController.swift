@@ -20,8 +20,16 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
         statusItem.menu = statusMenu
     }
     
+    func gotSensorsValues(rdgs: [Reading]) {
+        var inTitle = ""
+        for reading in rdgs {
+            inTitle += String(format: "%f%@ ", reading.value, reading.type.unit)
+        }
+        inTitle = inTitle.substring(to: inTitle.index(before: inTitle.endIndex))
+        statusItem.title = inTitle
+    }
+    
     func appInitiated(app: App) {
-        print(app, Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)
         if app.latest < Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String {
             let alert = NSAlert()
             alert.addButton(withTitle: "Сейчас")
@@ -30,8 +38,10 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
             alert.informativeText = "Вы хотие обновить сейчас?"
             alert.alertStyle = NSInformationalAlertStyle
             
-            if alert.runModal() == NSAlertFirstButtonReturn {
-                
+            DispatchQueue.main.sync {
+                if alert.runModal() == NSAlertFirstButtonReturn {
+                    
+                }
             }
         }
     }
