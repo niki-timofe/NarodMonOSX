@@ -3,13 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		11A4E6701DC24A0B001470BF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A4E66F1DC24A0B001470BF /* AppDelegate.swift */; };
 		11A4E6721DC24A0B001470BF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11A4E6711DC24A0B001470BF /* Assets.xcassets */; };
 		11A4E6751DC24A0B001470BF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11A4E6731DC24A0B001470BF /* MainMenu.xib */; };
+		11A4E67F1DC24F40001470BF /* StatusMenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A4E67E1DC24F40001470BF /* StatusMenuController.swift */; };
+		11A4E6811DC252AE001470BF /* NarodMonAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A4E6801DC252AE001470BF /* NarodMonAPI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +20,10 @@
 		11A4E6711DC24A0B001470BF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11A4E6741DC24A0B001470BF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		11A4E6761DC24A0B001470BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		11A4E67D1DC24A7D001470BF /* NarodMonWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NarodMonWidget.entitlements; sourceTree = "<group>"; };
+		11A4E67E1DC24F40001470BF /* StatusMenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusMenuController.swift; sourceTree = "<group>"; };
+		11A4E6801DC252AE001470BF /* NarodMonAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NarodMonAPI.swift; sourceTree = "<group>"; };
+		11A4E6851DC2FB73001470BF /* NarodMonWidget-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NarodMonWidget-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +42,7 @@
 			children = (
 				11A4E66E1DC24A0B001470BF /* NarodMonWidget */,
 				11A4E66D1DC24A0B001470BF /* Products */,
+				11A4E6821DC264FF001470BF /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -50,12 +57,23 @@
 		11A4E66E1DC24A0B001470BF /* NarodMonWidget */ = {
 			isa = PBXGroup;
 			children = (
+				11A4E67D1DC24A7D001470BF /* NarodMonWidget.entitlements */,
 				11A4E66F1DC24A0B001470BF /* AppDelegate.swift */,
 				11A4E6711DC24A0B001470BF /* Assets.xcassets */,
 				11A4E6731DC24A0B001470BF /* MainMenu.xib */,
+				11A4E6801DC252AE001470BF /* NarodMonAPI.swift */,
+				11A4E67E1DC24F40001470BF /* StatusMenuController.swift */,
 				11A4E6761DC24A0B001470BF /* Info.plist */,
+				11A4E6851DC2FB73001470BF /* NarodMonWidget-Bridging-Header.h */,
 			);
 			path = NarodMonWidget;
+			sourceTree = "<group>";
+		};
+		11A4E6821DC264FF001470BF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -67,6 +85,7 @@
 			buildPhases = (
 				11A4E6681DC24A0B001470BF /* Sources */,
 				11A4E6691DC24A0B001470BF /* Frameworks */,
+				11A4E67C1DC24A52001470BF /* Increment Build */,
 				11A4E66A1DC24A0B001470BF /* Resources */,
 			);
 			buildRules = (
@@ -90,13 +109,18 @@
 				TargetAttributes = {
 					11A4E66B1DC24A0B001470BF = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = K8RU6J728Q;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
 			buildConfigurationList = 11A4E6671DC24A0A001470BF /* Build configuration list for PBXProject "NarodMonWidget" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -125,11 +149,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		11A4E67C1DC24A52001470BF /* Increment Build */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Increment Build";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		11A4E6681DC24A0B001470BF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11A4E67F1DC24F40001470BF /* StatusMenuController.swift in Sources */,
+				11A4E6811DC252AE001470BF /* NarodMonAPI.swift in Sources */,
 				11A4E6701DC24A0B001470BF /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -188,7 +232,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -231,7 +275,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -242,12 +286,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = NarodMonWidget/NarodMonWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = K8RU6J728Q;
 				INFOPLIST_FILE = NarodMonWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.NarodMonWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "NarodMonWidget/NarodMonWidget-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -256,12 +306,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = NarodMonWidget/NarodMonWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = K8RU6J728Q;
 				INFOPLIST_FILE = NarodMonWidget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.NarodMonWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "NarodMonWidget/NarodMonWidget-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
