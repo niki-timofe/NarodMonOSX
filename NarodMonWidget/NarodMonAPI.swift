@@ -67,30 +67,31 @@ class NarodMonAPI {
     
     func locationFromAppInit(data: Data) -> App? {
         typealias JSONDict = [String:AnyObject]
-        let json : JSONDict
+        let json: JSONDict
         
         do {
             json = try JSONSerialization.jsonObject(with: data, options: []) as! JSONDict
         } catch {
-            NSLog("JSON parsing failed: \(error)")
+            print("JSON parsing failed: \(error)")
             return nil
         }
         
+        print(json)
         return App(lat: json["lat"] as! Float, lng: json["lng"] as! Float, latest: json["latest"] as! String, url: json["url"] as! String)
     }
     
-    func appInit() -> Data? {
+    func appInit() -> Void {
         request.httpMethod = "POST"
         let osVersion = ProcessInfo().operatingSystemVersion
         let postObject = ["cmd": "appInit", "uuid": uuid(), "api_key": API_KEY, "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String, "lang": "ru", "platform": String(format: "%d.%d.%d", osVersion.majorVersion, osVersion.minorVersion, osVersion.patchVersion)]
         let postData = toJSONData(dict: postObject)
-        
         request.httpBody = postData
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); return}
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
                 print("statusCode should be 200, but is \(httpStatus.statusCode)")
                 print("response = \(response)")
+                return
             }
             
             if let app = self.locationFromAppInit(data: data) {
@@ -98,7 +99,6 @@ class NarodMonAPI {
             }
         }
         task.resume()
-        return nil
     }
     
     
