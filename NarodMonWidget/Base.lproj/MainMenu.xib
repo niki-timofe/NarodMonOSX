@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
     </dependencies>
     <objects>
@@ -17,16 +16,47 @@
         <customObject id="MIc-jK-RNp" customClass="StatusMenuController" customModule="NarodMonWidget" customModuleProvider="target">
             <connections>
                 <outlet property="statusMenu" destination="wAj-RY-mUf" id="7js-na-PVc"/>
+                <outlet property="weatherView" destination="dnv-8r-U6L" id="IxN-ji-GkV"/>
             </connections>
         </customObject>
         <menu id="wAj-RY-mUf">
             <items>
+                <menuItem title="Обновить" keyEquivalent="u" id="ccc-Rz-wju">
+                    <connections>
+                        <action selector="updateBtnAction:" target="MIc-jK-RNp" id="saQ-dh-Naj"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="5B6-cm-4Uc"/>
+                <menuItem title="Weather" id="6rQ-gp-sD7">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="I6O-iu-YTW"/>
                 <menuItem title="Завершить" keyEquivalent="q" id="Zm0-1d-nm9">
                     <connections>
                         <action selector="quitBtnAction:" target="MIc-jK-RNp" id="mtF-M8-CR7"/>
                     </connections>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="75" y="145"/>
         </menu>
+        <customView id="dnv-8r-U6L" customClass="WeatherView" customModule="NarodMonWidget" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="210" height="51"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Sam-gr-IUp">
+                    <rect key="frame" x="18" y="0.0" width="174" height="51"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="ZCG-Uk-Q9V">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <connections>
+                <outlet property="conditionsTextField" destination="Sam-gr-IUp" id="s4w-Qb-al0"/>
+            </connections>
+            <point key="canvasLocation" x="104" y="261"/>
+        </customView>
     </objects>
 </document>
