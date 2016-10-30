@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		112ECCB21DC4DB0500E221A3 /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112ECCB11DC4DB0500E221A3 /* WeatherView.swift */; };
 		11A4E6701DC24A0B001470BF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A4E66F1DC24A0B001470BF /* AppDelegate.swift */; };
 		11A4E6721DC24A0B001470BF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11A4E6711DC24A0B001470BF /* Assets.xcassets */; };
 		11A4E6751DC24A0B001470BF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11A4E6731DC24A0B001470BF /* MainMenu.xib */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		112ECCB11DC4DB0500E221A3 /* WeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
 		11A4E66C1DC24A0B001470BF /* NarodMonWidget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NarodMonWidget.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11A4E66F1DC24A0B001470BF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		11A4E6711DC24A0B001470BF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 				11A4E66F1DC24A0B001470BF /* AppDelegate.swift */,
 				11A4E6711DC24A0B001470BF /* Assets.xcassets */,
 				11A4E6731DC24A0B001470BF /* MainMenu.xib */,
+				112ECCB11DC4DB0500E221A3 /* WeatherView.swift */,
 				11A4E6801DC252AE001470BF /* NarodMonAPI.swift */,
 				11A4E67E1DC24F40001470BF /* StatusMenuController.swift */,
 				11A4E6761DC24A0B001470BF /* Info.plist */,
@@ -167,6 +170,7 @@
 				11A4E67F1DC24F40001470BF /* StatusMenuController.swift in Sources */,
 				11A4E6811DC252AE001470BF /* NarodMonAPI.swift in Sources */,
 				11A4E6701DC24A0B001470BF /* AppDelegate.swift in Sources */,
+				112ECCB21DC4DB0500E221A3 /* WeatherView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

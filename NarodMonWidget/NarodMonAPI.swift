@@ -16,18 +16,18 @@ struct App {
 }
 
 struct Sensor {
-    let id: UInt
+    let id: Int
     let type: Type
 }
 
 struct Reading {
     let value: Float
-    let sensor: UInt
-    let time: UInt
+    let sensor: Int
+    let time: Int
 }
 
 struct Type {
-    let id: UInt8
+    let id: Int
     let name: String
     let unit: String
 }
@@ -36,6 +36,18 @@ protocol NarodMonAPIDelegate {
     func appInitiated(app: App)
     func gotSensorsValues(rdgs: [Reading])
     func gotSensorsList(sensors: [Sensor])
+}
+
+extension String {
+    var first: String {
+        return String(characters.prefix(1))
+    }
+    var last: String {
+        return String(characters.suffix(1))
+    }
+    var uppercaseFirst: String {
+        return first.uppercased() + String(characters.dropFirst())
+    }
 }
 
 class NarodMonAPI {
@@ -100,7 +112,11 @@ class NarodMonAPI {
         types = []
         
         for type in json["types"] as! [[String:Any]] {
-            types.append(Type(id: type["type"] as! UInt8, name: type["name"] as! String, unit: type["unit"] as! String))
+            var title = (type["name"] as! String).uppercaseFirst
+            
+            title = title.components(separatedBy: ",")[0]
+            
+            types.append(Type(id: type["type"] as! Int, name: title, unit: type["unit"] as! String))
         }
         
         return App(lat: json["lat"] as! Float,
@@ -149,7 +165,7 @@ class NarodMonAPI {
         var senss: [Sensor] = []
         for device in json["devices"] as! [[String:Any]] {
             for sensor in device["sensors"] as! [[String:Any]] {
-                senss.append(Sensor(id: sensor["id"] as! UInt, type: self.types[sensor["type"] as! Int]))
+                senss.append(Sensor(id: sensor["id"] as! Int, type: self.types[sensor["type"] as! Int]))
             }
         }
         
@@ -193,14 +209,14 @@ class NarodMonAPI {
         var readings: [Reading] = []
         for sensor in json["sensors"] as! [[String:Any]] {
             readings.append(Reading(value: sensor["value"] as! Float,
-                                    sensor: sensor["id"] as! UInt,
-                                    time: sensor["time"] as! UInt))
+                                    sensor: sensor["id"] as! Int,
+                                    time: sensor["time"] as! Int))
         }
         
         return readings
     }
     
-    func sensorsValues(sensors: [UInt]) {
+    func sensorsValues(sensors: [Int]) {
         let postObject = ["cmd": "sensorsValues",
                           "uuid": uuid(),
                           "api_key": API_KEY,

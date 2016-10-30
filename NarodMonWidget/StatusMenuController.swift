@@ -10,19 +10,29 @@ import Cocoa
 
 class StatusMenuController: NSObject, NarodMonAPIDelegate {
     @IBOutlet weak var statusMenu: NSMenu!
+    @IBOutlet weak var weatherView: WeatherView!
     
     let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
+    
+    var weatherMenuItem: NSMenuItem!
     var narodMonAPI: NarodMonAPI!
-    var sensorsList: [UInt:Type] = [:]
+    var sensorsList: [Int:Type] = [:]
 
     override func awakeFromNib() {
+        weatherMenuItem = statusMenu.item(withTitle: "Weather")
+        weatherMenuItem.view = weatherView
+        
         narodMonAPI = NarodMonAPI(delegate: self)
         statusItem.title = "~"
         statusItem.menu = statusMenu
     }
     
+    @IBAction func updateBtnAction(_ sender: NSMenuItem) {
+        narodMonAPI.sensorsNearby()
+    }
+    
     func gotSensorsList(sensors: [Sensor]) {
-        var sensList: [UInt] = []
+        var sensList: [Int] = []
         
         for sensor in sensors {
             sensorsList.updateValue(sensor.type, forKey: sensor.id)
@@ -33,11 +43,37 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
     
     func gotSensorsValues(rdgs: [Reading]) {
         var inTitle = ""
+        
+        var results = [Int:Float]()
+        var counters = [Int:Float]()
+        
         for reading in rdgs {
-            inTitle += String(format: "%.1f%@ ", reading.value, sensorsList[reading.sensor]!.unit)
+            if let result = results[sensorsList[reading.sensor]!.id] {
+                results.updateValue(result + reading.value,
+                                    forKey: sensorsList[reading.sensor]!.id)
+                counters.updateValue(counters[sensorsList[reading.sensor]!.id]! + 1.0,
+                                     forKey: sensorsList[reading.sensor]!.id)
+
+            } else {
+                results.updateValue(reading.value,
+                                    forKey: sensorsList[reading.sensor]!.id)
+                counters.updateValue(1.0,
+                                     forKey: sensorsList[reading.sensor]!.id)
+            }
+        }
+    
+        statusItem.title = String(format: "%.1f%@ ",
+                                 results[1]! / counters[1]!,
+                                 narodMonAPI.types[1].unit)
+        
+        for type in Array(results.keys).sorted() {
+            inTitle += String(format: "%@: %.1f%@\n",
+                              narodMonAPI.types[type].name,
+                              results[type]! / counters[type]!,
+                              narodMonAPI.types[type].unit)
         }
         inTitle = inTitle.substring(to: inTitle.index(before: inTitle.endIndex))
-        statusItem.title = inTitle
+        weatherView.conditionsTextField.stringValue = inTitle
     }
     
     func appInitiated(app: App) {
