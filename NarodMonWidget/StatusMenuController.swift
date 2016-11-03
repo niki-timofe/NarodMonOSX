@@ -17,6 +17,7 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
     var weatherMenuItem: NSMenuItem!
     var narodMonAPI: NarodMonAPI!
     var sensorsList: [Int:Type] = [:]
+    var updateTimer: Timer!
 
     override func awakeFromNib() {        
         narodMonAPI = NarodMonAPI(delegate: self)
@@ -37,7 +38,14 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
             sensorsList.updateValue(sensor.type, forKey: sensor.id)
             sensList.append(sensor.id)
         }
-        narodMonAPI.sensorsValues(sensors: sensList)
+        //narodMonAPI.sensorsValues(sensors: sensList)
+        
+        if (updateTimer != nil) {
+            updateTimer.invalidate()
+        }
+        updateTimer = Timer.init(timeInterval: 3 * 60, target: self, selector: #selector(StatusMenuController.performUpdateValues), userInfo:nil , repeats: true)
+        RunLoop.main.add(updateTimer, forMode: RunLoopMode.commonModes)
+        updateTimer.fire()
     }
     
     func gotSensorsValues(rdgs: [Reading]) {
@@ -78,6 +86,10 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
         frame.size.width = weatherView.attributedString().size().width + 42
         weatherView.frame = frame
         
+    }
+    
+    func performUpdateValues() -> Void {
+        narodMonAPI.sensorsValues(sensors: Array(sensorsList.keys))
     }
     
     func appInitiated(app: App) {
