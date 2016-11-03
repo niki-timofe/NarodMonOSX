@@ -16,7 +16,7 @@
         <customObject id="MIc-jK-RNp" customClass="StatusMenuController" customModule="NarodMonWidget" customModuleProvider="target">
             <connections>
                 <outlet property="statusMenu" destination="wAj-RY-mUf" id="7js-na-PVc"/>
-                <outlet property="weatherView" destination="dnv-8r-U6L" id="IxN-ji-GkV"/>
+                <outlet property="weatherView" destination="sT5-qx-W03" id="xD9-Bu-gip"/>
             </connections>
         </customObject>
         <menu id="wAj-RY-mUf">
@@ -29,6 +29,9 @@
                 <menuItem isSeparatorItem="YES" id="5B6-cm-4Uc"/>
                 <menuItem title="Weather" id="6rQ-gp-sD7">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <outlet property="view" destination="sT5-qx-W03" id="bp1-4W-HnG"/>
+                    </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="I6O-iu-YTW"/>
                 <menuItem title="Завершить" keyEquivalent="q" id="Zm0-1d-nm9">
@@ -39,24 +42,33 @@
             </items>
             <point key="canvasLocation" x="75" y="145"/>
         </menu>
-        <customView id="dnv-8r-U6L" customClass="WeatherView" customModule="NarodMonWidget" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="210" height="51"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Sam-gr-IUp">
-                    <rect key="frame" x="18" y="0.0" width="174" height="51"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="ZCG-Uk-Q9V">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+        <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="Sw7-fe-Eoh">
+            <rect key="frame" x="0.0" y="0.0" width="144" height="45"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <clipView key="contentView" id="KEO-HK-EM0">
+                <rect key="frame" x="1" y="1" width="142" height="43"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <subviews>
+                    <textView editable="NO" selectable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" horizontallyResizable="YES" findStyle="panel" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="sT5-qx-W03" customClass="WeatherView" customModule="NarodMonWidget" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="142" height="43"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-            </subviews>
-            <connections>
-                <outlet property="conditionsTextField" destination="Sam-gr-IUp" id="s4w-Qb-al0"/>
-            </connections>
-            <point key="canvasLocation" x="104" y="261"/>
-        </customView>
+                        <size key="minSize" width="142" height="43"/>
+                        <size key="maxSize" width="463" height="10000000"/>
+                        <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                    </textView>
+                </subviews>
+                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            </clipView>
+            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="3m9-QC-4GZ">
+                <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </scroller>
+            <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="oxT-7l-Ji3">
+                <rect key="frame" x="127" y="1" width="16" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </scroller>
+            <point key="canvasLocation" x="339" y="47.5"/>
+        </scrollView>
     </objects>
 </document>

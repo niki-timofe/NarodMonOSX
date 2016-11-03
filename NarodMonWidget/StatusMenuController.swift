@@ -18,13 +18,12 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
     var narodMonAPI: NarodMonAPI!
     var sensorsList: [Int:Type] = [:]
 
-    override func awakeFromNib() {
-        weatherMenuItem = statusMenu.item(withTitle: "Weather")
-        weatherMenuItem.view = weatherView
-        
+    override func awakeFromNib() {        
         narodMonAPI = NarodMonAPI(delegate: self)
         statusItem.title = "~"
         statusItem.menu = statusMenu
+        
+        weatherView.textContainerInset = NSSize(width: 16, height: 0)
     }
     
     @IBAction func updateBtnAction(_ sender: NSMenuItem) {
@@ -73,7 +72,12 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
                               narodMonAPI.types[type].unit)
         }
         inTitle = inTitle.substring(to: inTitle.index(before: inTitle.endIndex))
-        weatherView.conditionsTextField.stringValue = inTitle
+        
+        weatherView.textStorage?.mutableString.setString(inTitle)
+        var frame = weatherView.frame
+        frame.size.width = weatherView.attributedString().size().width + 42
+        weatherView.frame = frame
+        
     }
     
     func appInitiated(app: App) {
