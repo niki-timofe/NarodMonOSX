@@ -8,9 +8,7 @@
 
 import Cocoa
 
-class WeatherView: NSView {
-    @IBOutlet weak var infoTextField: NSTextField!
-    @IBOutlet weak var conditionsTextField: NSTextField!
+class WeatherView: NSTextView {
     
 //    func update(weather: Weather) {
 //        DispatchQueue.main.async {
