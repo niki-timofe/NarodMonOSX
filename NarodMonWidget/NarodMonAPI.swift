@@ -159,12 +159,21 @@ class NarodMonAPI {
                                                     options: []) as! JSONDict
         } catch {
             print("JSON parsing failed: \(error)")
-            return nil
+            return nil                                                  //TODO: Error notification
         }
         
         var senss: [Sensor] = []
+        if !(json.keys.contains("devices")) {
+            return nil                                              //TODO: Error notification
+        }
         for device in json["devices"] as! [[String:Any]] {
+            if !(device.keys.contains("sensors")) {
+                return nil                                              //TODO: Error notification
+            }
             for sensor in device["sensors"] as! [[String:Any]] {
+                if !(sensor.keys.contains("id") && sensor.keys.contains("type")) {
+                    return nil                                          //TODO: Error notification
+                }
                 senss.append(Sensor(id: sensor["id"] as! Int, type: self.types[sensor["type"] as! Int]))
             }
         }
@@ -207,7 +216,14 @@ class NarodMonAPI {
         }
         
         var readings: [Reading] = []
+        
+        if !(json.keys.contains("sensors")) {
+            return nil                                              //TODO: Error notification
+        }
         for sensor in json["sensors"] as! [[String:Any]] {
+            if !(sensor.keys.contains("value") && sensor.keys.contains("id") && sensor.keys.contains("time")) {
+                return nil                                          //TODO: Error notification
+            }
             readings.append(Reading(value: sensor["value"] as! Float,
                                     sensor: sensor["id"] as! Int,
                                     time: sensor["time"] as! Int))
