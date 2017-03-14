@@ -10,21 +10,22 @@ import Cocoa
 
 class StatusMenuController: NSObject, NarodMonAPIDelegate {
     @IBOutlet weak var statusMenu: NSMenu!
-    @IBOutlet weak var weatherView: WeatherView!
+    @IBOutlet weak var updateMenuItem: NSMenuItem!
+    @IBOutlet weak var readingsTable: NSTableView!
     
     let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
     
-    var weatherMenuItem: NSMenuItem!
     var narodMonAPI: NarodMonAPI!
     var sensorsList: [Int:Type] = [:]
     var updateTimer: Timer!
+    
+    var results = [Int:Float]()
+    var counters = [Int:Float]()
 
     override func awakeFromNib() {        
         narodMonAPI = NarodMonAPI(delegate: self)
         statusItem.title = "~"
         statusItem.menu = statusMenu
-        
-        weatherView.textContainerInset = NSSize(width: 16, height: 0)
     }
     
     @IBAction func updateBtnAction(_ sender: NSMenuItem) {
@@ -49,11 +50,6 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
     }
     
     func gotSensorsValues(rdgs: [Reading]) {
-        var inTitle = ""
-        
-        var results = [Int:Float]()
-        var counters = [Int:Float]()
-        
         for reading in rdgs {
             if let result = results[sensorsList[reading.sensor]!.id] {
                 results.updateValue(result + reading.value,
@@ -73,19 +69,8 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
                                  results[1]! / counters[1]!,
                                  narodMonAPI.types[1].unit)
         
-        for type in Array(results.keys).sorted() {
-            inTitle += String(format: "%@: %.1f%@\n",
-                              narodMonAPI.types[type].name,
-                              results[type]! / counters[type]!,
-                              narodMonAPI.types[type].unit)
-        }
-        inTitle = inTitle.substring(to: inTitle.index(before: inTitle.endIndex))
-        
-        weatherView.textStorage?.mutableString.setString(inTitle)
-        var frame = weatherView.frame
-        frame.size.width = weatherView.attributedString().size().width + 42
-        weatherView.frame = frame
-        
+        let updateTime = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        updateMenuItem.title = String(format: "Обновить (%d:%d)", updateTime.hour!, updateTime.minute!)
     }
     
     func performUpdateValues() -> Void {
@@ -113,5 +98,29 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
     
     @IBAction func quitBtnAction(_ sender: NSMenuItem) {
         NSApplication.shared().terminate(self)
+    }
+}
+
+extension StatusMenuController: NSTableViewDataSource, NSTableViewDelegate {
+    func numberOfRows(in tableView: NSTableView) -> Int {
+        return (results.count)
+    }
+    
+    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any?{
+        var result = ""
+        
+        let type = Array(results.keys).sorted()[row]
+        
+        let columnIdentifier = tableColumn?.identifier
+        if columnIdentifier == "type" {
+            result = narodMonAPI.types[type].unit
+        }
+        if columnIdentifier == "name" {
+            result = narodMonAPI.types[type].name
+        }
+        if columnIdentifier == "value" {
+            result = String(format:"%.1f", results[type]! / counters[type]!)
+        }
+        return result
     }
 }
