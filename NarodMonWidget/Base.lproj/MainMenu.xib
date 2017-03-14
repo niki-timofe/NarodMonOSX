@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16E154a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -17,7 +17,7 @@
         <customObject id="MIc-jK-RNp" customClass="StatusMenuController" customModule="NarodMonWidget" customModuleProvider="target">
             <connections>
                 <outlet property="statusMenu" destination="wAj-RY-mUf" id="7js-na-PVc"/>
-                <outlet property="weatherView" destination="sT5-qx-W03" id="xD9-Bu-gip"/>
+                <outlet property="updateMenuItem" destination="ccc-Rz-wju" id="N6P-38-kC1"/>
             </connections>
         </customObject>
         <menu id="wAj-RY-mUf">
@@ -31,7 +31,7 @@
                 <menuItem title="Weather" id="6rQ-gp-sD7">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <outlet property="view" destination="sT5-qx-W03" id="bp1-4W-HnG"/>
+                        <outlet property="view" destination="ngT-QE-PSM" id="N8z-SF-mmx"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="I6O-iu-YTW"/>
@@ -43,33 +43,71 @@
             </items>
             <point key="canvasLocation" x="75" y="145"/>
         </menu>
-        <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="Sw7-fe-Eoh">
-            <rect key="frame" x="0.0" y="0.0" width="151" height="45"/>
-            <autoresizingMask key="autoresizingMask"/>
-            <clipView key="contentView" id="KEO-HK-EM0">
-                <rect key="frame" x="1" y="1" width="149" height="43"/>
-                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                <subviews>
-                    <textView editable="NO" selectable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" horizontallyResizable="YES" findStyle="panel" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="sT5-qx-W03" customClass="WeatherView" customModule="NarodMonWidget" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="149" height="43"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        <size key="minSize" width="149" height="43"/>
-                        <size key="maxSize" width="463" height="10000000"/>
-                        <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                    </textView>
-                </subviews>
-                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-            </clipView>
-            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="3m9-QC-4GZ">
-                <rect key="frame" x="-100" y="-100" width="87" height="18"/>
-                <autoresizingMask key="autoresizingMask"/>
-            </scroller>
-            <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="oxT-7l-Ji3">
-                <rect key="frame" x="134" y="1" width="16" height="43"/>
-                <autoresizingMask key="autoresizingMask"/>
-            </scroller>
-            <point key="canvasLocation" x="74.5" y="257.5"/>
-        </scrollView>
+        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" id="ngT-QE-PSM">
+            <rect key="frame" x="0.0" y="0.0" width="222" height="19"/>
+            <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+            <size key="intercellSpacing" width="0.0" height="2"/>
+            <color key="backgroundColor" name="windowBackgroundColor" catalog="System" colorSpace="catalog"/>
+            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+            <tableColumns>
+                <tableColumn identifier="" width="20" minWidth="10" maxWidth="3.4028234663852886e+38" id="YnU-kN-B1W">
+                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tableHeaderCell>
+                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="RMl-lx-jqK">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                </tableColumn>
+                <tableColumn identifier="name" editable="NO" width="97" minWidth="60" maxWidth="3.4028234663852886e+38" id="RpR-yF-FMR">
+                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tableHeaderCell>
+                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" alignment="left" title="Text Cell" usesSingleLineMode="YES" id="v0n-Br-gA2">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                </tableColumn>
+                <tableColumn identifier="value" editable="NO" width="55" minWidth="5" maxWidth="3.4028234663852886e+38" id="DyW-eg-Mgv">
+                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tableHeaderCell>
+                    <textFieldCell key="dataCell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" alignment="right" title="0.0" id="AK6-sS-X2l">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                </tableColumn>
+                <tableColumn identifier="type" editable="NO" width="50" minWidth="5" maxWidth="3.4028234663852886e+38" id="v7x-Zt-bMW">
+                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tableHeaderCell>
+                    <textFieldCell key="dataCell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" alignment="left" title="d" id="X6i-ck-j92">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                </tableColumn>
+            </tableColumns>
+            <connections>
+                <outlet property="dataSource" destination="MIc-jK-RNp" id="4Z8-gW-esI"/>
+                <outlet property="delegate" destination="MIc-jK-RNp" id="5jw-O3-Opf"/>
+            </connections>
+            <point key="canvasLocation" x="106.5" y="380.5"/>
+        </tableView>
     </objects>
 </document>
