@@ -47,7 +47,7 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
         if (updateTimer != nil) {
             updateTimer.invalidate()
         }
-        updateTimer = Timer.init(timeInterval: 3 * 60, target: self, selector: #selector(StatusMenuController.performUpdateValues), userInfo:nil , repeats: true)
+        updateTimer = Timer.init(timeInterval: 15 * 60, target: self, selector: #selector(StatusMenuController.performUpdateValues), userInfo:nil , repeats: true)
         RunLoop.main.add(updateTimer, forMode: RunLoopMode.commonModes)
         updateTimer.fire()
     }
@@ -75,6 +75,7 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
         updateMenuItem.title = dateFormatter.string(from: Date())
     
         for type in results.keys {
+            statusMenu.removeItem(at: 4)
             statusMenu.insertItem(NSMenuItem(title: String(format: "%@\t%.1f%@", narodMonAPI.types[type].name, results[type]! / counters[type]!, narodMonAPI.types[type].unit), action: nil, keyEquivalent: ""), at: 3)
         }
     }
