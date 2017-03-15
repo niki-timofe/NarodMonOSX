@@ -69,8 +69,9 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
                                  results[1]! / counters[1]!,
                                  narodMonAPI.types[1].unit)
         
-        let updateTime = Calendar.current.dateComponents([.hour, .minute], from: Date())
-        updateMenuItem.title = String(format: "Обновить (%d:%d)", updateTime.hour!, updateTime.minute!)
+        for type in results.keys {
+            statusMenu.insertItem(NSMenuItem(title: String(format: "%@\t%.1f%@", narodMonAPI.types[type].name, results[type]! / counters[type]!, narodMonAPI.types[type].unit), action: nil, keyEquivalent: ""), at: 3)
+        }
     }
     
     func performUpdateValues() -> Void {
@@ -98,29 +99,5 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
     
     @IBAction func quitBtnAction(_ sender: NSMenuItem) {
         NSApplication.shared().terminate(self)
-    }
-}
-
-extension StatusMenuController: NSTableViewDataSource, NSTableViewDelegate {
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return (results.count)
-    }
-    
-    func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any?{
-        var result = ""
-        
-        let type = Array(results.keys).sorted()[row]
-        
-        let columnIdentifier = tableColumn?.identifier
-        if columnIdentifier == "type" {
-            result = narodMonAPI.types[type].unit
-        }
-        if columnIdentifier == "name" {
-            result = narodMonAPI.types[type].name
-        }
-        if columnIdentifier == "value" {
-            result = String(format:"%.1f", results[type]! / counters[type]!)
-        }
-        return result
     }
 }
