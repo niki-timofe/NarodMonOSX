@@ -14,6 +14,7 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
     @IBOutlet weak var readingsTable: NSTableView!
     
     let statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
+    let dateFormatter = DateFormatter()
     
     var narodMonAPI: NarodMonAPI!
     var sensorsList: [Int:Type] = [:]
@@ -26,6 +27,8 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
         narodMonAPI = NarodMonAPI(delegate: self)
         statusItem.title = "~"
         statusItem.menu = statusMenu
+        
+        dateFormatter.dateFormat = "H:mm"
     }
     
     @IBAction func updateBtnAction(_ sender: NSMenuItem) {
@@ -69,6 +72,8 @@ class StatusMenuController: NSObject, NarodMonAPIDelegate {
                                  results[1]! / counters[1]!,
                                  narodMonAPI.types[1].unit)
         
+        updateMenuItem.title = dateFormatter.string(from: Date())
+    
         for type in results.keys {
             statusMenu.insertItem(NSMenuItem(title: String(format: "%@\t%.1f%@", narodMonAPI.types[type].name, results[type]! / counters[type]!, narodMonAPI.types[type].unit), action: nil, keyEquivalent: ""), at: 3)
         }
