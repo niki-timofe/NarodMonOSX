@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16E154a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
-        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -33,9 +32,9 @@
                 <menuItem isSeparatorItem="YES" id="5B6-cm-4Uc"/>
                 <menuItem title="Weather" enabled="NO" id="kDU-1o-Zlv">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <outlet property="view" destination="ngT-QE-PSM" id="5lV-0a-veE"/>
-                    </connections>
+                </menuItem>
+                <menuItem title="Weather" enabled="NO" id="hep-CZ-LZe">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="I6O-iu-YTW"/>
                 <menuItem title="Завершить" keyEquivalent="q" id="Zm0-1d-nm9">
@@ -46,70 +45,5 @@
             </items>
             <point key="canvasLocation" x="75" y="145"/>
         </menu>
-        <tableView autoresizesSubviews="NO" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="sequential" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="22" rowSizeStyle="small" id="ngT-QE-PSM">
-            <rect key="frame" x="0.0" y="0.0" width="231" height="22"/>
-            <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-            <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-            <color key="gridColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-            <tableColumns>
-                <tableColumn identifier="" width="19" minWidth="10" maxWidth="3.4028234663852886e+38" id="YnU-kN-B1W">
-                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    </tableHeaderCell>
-                    <textFieldCell key="dataCell" lineBreakMode="truncatingMiddle" selectable="YES" editable="YES" enabled="NO" alignment="left" title="Text Cell" id="RMl-lx-jqK">
-                        <font key="font" size="14" name=".AppleSystemUIFont"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                </tableColumn>
-                <tableColumn identifier="name" editable="NO" width="105" minWidth="60" maxWidth="3.4028234663852886e+38" id="RpR-yF-FMR">
-                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    </tableHeaderCell>
-                    <textFieldCell key="dataCell" lineBreakMode="truncatingMiddle" enabled="NO" alignment="left" title="Text Cell" usesSingleLineMode="YES" id="v0n-Br-gA2">
-                        <font key="font" metaFont="menuBar"/>
-                        <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
-                </tableColumn>
-                <tableColumn identifier="value" editable="NO" width="54" minWidth="5" maxWidth="3.4028234663852886e+38" id="DyW-eg-Mgv">
-                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="right">
-                        <font key="font" size="14" name=".AppleSystemUIFont"/>
-                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    </tableHeaderCell>
-                    <textFieldCell key="dataCell" lineBreakMode="truncatingMiddle" selectable="YES" editable="YES" enabled="NO" alignment="right" title="0.0" id="AK6-sS-X2l">
-                        <font key="font" metaFont="menuBar"/>
-                        <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
-                </tableColumn>
-                <tableColumn identifier="type" editable="NO" width="53" minWidth="5" maxWidth="3.4028234663852886e+38" id="v7x-Zt-bMW">
-                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                        <font key="font" size="14" name=".AppleSystemUIFont"/>
-                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    </tableHeaderCell>
-                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" enabled="NO" alignment="left" title="d" id="X6i-ck-j92">
-                        <font key="font" metaFont="menuBar"/>
-                        <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
-                </tableColumn>
-            </tableColumns>
-            <connections>
-                <outlet property="dataSource" destination="MIc-jK-RNp" id="4Z8-gW-esI"/>
-                <outlet property="delegate" destination="MIc-jK-RNp" id="5jw-O3-Opf"/>
-            </connections>
-            <point key="canvasLocation" x="303" y="115"/>
-        </tableView>
     </objects>
 </document>
