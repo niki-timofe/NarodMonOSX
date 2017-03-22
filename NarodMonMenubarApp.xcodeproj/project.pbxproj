@@ -1,0 +1,292 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		11A3D1DF1E82CE5D00E7163D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A3D1DE1E82CE5D00E7163D /* AppDelegate.swift */; };
+		11A3D1E11E82CE5D00E7163D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11A3D1E01E82CE5D00E7163D /* Assets.xcassets */; };
+		11A3D1E41E82CE5D00E7163D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11A3D1E21E82CE5D00E7163D /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		11A3D1DB1E82CE5D00E7163D /* NarodMonMenubarApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NarodMonMenubarApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11A3D1DE1E82CE5D00E7163D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		11A3D1E01E82CE5D00E7163D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		11A3D1E31E82CE5D00E7163D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		11A3D1E51E82CE5D00E7163D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		11A3D1D81E82CE5D00E7163D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		11A3D1D21E82CE5D00E7163D = {
+			isa = PBXGroup;
+			children = (
+				11A3D1DD1E82CE5D00E7163D /* NarodMonMenubarApp */,
+				11A3D1DC1E82CE5D00E7163D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		11A3D1DC1E82CE5D00E7163D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				11A3D1DB1E82CE5D00E7163D /* NarodMonMenubarApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		11A3D1DD1E82CE5D00E7163D /* NarodMonMenubarApp */ = {
+			isa = PBXGroup;
+			children = (
+				11A3D1DE1E82CE5D00E7163D /* AppDelegate.swift */,
+				11A3D1E01E82CE5D00E7163D /* Assets.xcassets */,
+				11A3D1E21E82CE5D00E7163D /* MainMenu.xib */,
+				11A3D1E51E82CE5D00E7163D /* Info.plist */,
+			);
+			path = NarodMonMenubarApp;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		11A3D1DA1E82CE5D00E7163D /* NarodMonMenubarApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11A3D1E81E82CE5D00E7163D /* Build configuration list for PBXNativeTarget "NarodMonMenubarApp" */;
+			buildPhases = (
+				11A3D1D71E82CE5D00E7163D /* Sources */,
+				11A3D1D81E82CE5D00E7163D /* Frameworks */,
+				11A3D1D91E82CE5D00E7163D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NarodMonMenubarApp;
+			productName = NarodMonMenubarApp;
+			productReference = 11A3D1DB1E82CE5D00E7163D /* NarodMonMenubarApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		11A3D1D31E82CE5D00E7163D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0820;
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = "Nikita Timofeev";
+				TargetAttributes = {
+					11A3D1DA1E82CE5D00E7163D = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = K8RU6J728Q;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 11A3D1D61E82CE5D00E7163D /* Build configuration list for PBXProject "NarodMonMenubarApp" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 11A3D1D21E82CE5D00E7163D;
+			productRefGroup = 11A3D1DC1E82CE5D00E7163D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				11A3D1DA1E82CE5D00E7163D /* NarodMonMenubarApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		11A3D1D91E82CE5D00E7163D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11A3D1E11E82CE5D00E7163D /* Assets.xcassets in Resources */,
+				11A3D1E41E82CE5D00E7163D /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		11A3D1D71E82CE5D00E7163D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11A3D1DF1E82CE5D00E7163D /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		11A3D1E21E82CE5D00E7163D /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				11A3D1E31E82CE5D00E7163D /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		11A3D1E61E82CE5D00E7163D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		11A3D1E71E82CE5D00E7163D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+			};
+			name = Release;
+		};
+		11A3D1E91E82CE5D00E7163D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = K8RU6J728Q;
+				INFOPLIST_FILE = NarodMonMenubarApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.NarodMonMenubarApp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		11A3D1EA1E82CE5D00E7163D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = K8RU6J728Q;
+				INFOPLIST_FILE = NarodMonMenubarApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "ru.niki-timofe.NarodMonMenubarApp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		11A3D1D61E82CE5D00E7163D /* Build configuration list for PBXProject "NarodMonMenubarApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11A3D1E61E82CE5D00E7163D /* Debug */,
+				11A3D1E71E82CE5D00E7163D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		11A3D1E81E82CE5D00E7163D /* Build configuration list for PBXNativeTarget "NarodMonMenubarApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11A3D1E91E82CE5D00E7163D /* Debug */,
+				11A3D1EA1E82CE5D00E7163D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 11A3D1D31E82CE5D00E7163D /* Project object */;
+}
