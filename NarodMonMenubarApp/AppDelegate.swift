@@ -7,21 +7,60 @@
 //
 
 import Cocoa
+import CoreLocation
 
-@NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
-    @IBOutlet weak var window: NSWindow!
-
-
+    var locationManager: CLLocationManager?
+    var controller: StatusMenuController?
+    var locationTimer: Timer?
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+        locationManager = CLLocationManager()
+        locationManager!.delegate = self
+        locationManager!.desiredAccuracy = kCLLocationAccuracyKilometer
+        locationManager!.distanceFilter = 1000
+        controller = StatusMenuController()
+        
+        NSWorkspace.shared().notificationCenter.addObserver(self, selector: #selector(AppDelegate.wakeUpListener(_:)), name: NSNotification.Name.NSWorkspaceDidWake, object: nil)
     }
-
+    
+    func wakeUpListener(_ aNotification : NSNotification) {
+        Timer.scheduledTimer(withTimeInterval: 30, repeats: false, block: {_ in
+            if (self.locationTimer != nil) {self.locationTimer!.fire()}
+        })
+    }
+    
     func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
+        locationManager!.stopUpdatingLocation()
     }
-
-
+    
 }
 
+extension AppDelegate: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateTo newLocation: CLLocation, from oldLocation: CLLocation) {
+        controller!.updateLocation(location: newLocation)
+        locationManager!.stopUpdatingLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == CLAuthorizationStatus.authorizedAlways {
+            if CLLocationManager.locationServicesEnabled() {
+                if locationTimer != nil {locationTimer?.invalidate()}
+                
+                DispatchQueue.main.async {
+                    self.locationTimer = Timer.scheduledTimer(withTimeInterval: 30 * 60, repeats: true, block: {_ in
+                        self.locationManager!.startUpdatingLocation()
+                    })
+                    self.locationTimer!.fire()
+                }
+            }
+        } else {
+            controller!.updateLocation(location: nil)
+        }
+    }
+}
