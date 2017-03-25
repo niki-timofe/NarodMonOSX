@@ -76,6 +76,7 @@
 			buildConfigurationList = 11A3D1E81E82CE5D00E7163D /* Build configuration list for PBXNativeTarget "NarodMonMenubarApp" */;
 			buildPhases = (
 				11A3D1D71E82CE5D00E7163D /* Sources */,
+				11B8D29A1E86923700E834D4 /* Increment Build */,
 				11A3D1D81E82CE5D00E7163D /* Frameworks */,
 				11A3D1D91E82CE5D00E7163D /* Resources */,
 			);
@@ -137,6 +138,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		11B8D29A1E86923700E834D4 /* Increment Build */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Increment Build";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		11A3D1D71E82CE5D00E7163D /* Sources */ = {
@@ -250,6 +268,7 @@
 				CODE_SIGN_ENTITLEMENTS = NarodMonMenubarApp/NarodMonMenubarApp.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = K8RU6J728Q;
 				INFOPLIST_FILE = NarodMonMenubarApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -261,6 +280,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = BridgingHeader.h;
 				SWIFT_VERSION = 3.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
@@ -271,6 +291,7 @@
 				CODE_SIGN_ENTITLEMENTS = NarodMonMenubarApp/NarodMonMenubarApp.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = K8RU6J728Q;
 				INFOPLIST_FILE = NarodMonMenubarApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -282,6 +303,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = BridgingHeader.h;
 				SWIFT_VERSION = 3.0;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};

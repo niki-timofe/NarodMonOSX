@@ -94,7 +94,9 @@ public class NarodMonAPI {
             let jsonData = try JSONSerialization.data(withJSONObject: dict)
             return jsonData
         } catch {
-            print(error.localizedDescription)
+            NSLog("JSON parsing failed: \(error.localizedDescription)")
+            NSLog("UUID: \(uuid())")
+            NSLog("Data: \(dict)")
         }
         return nil
     }
@@ -106,7 +108,9 @@ public class NarodMonAPI {
         do {
             json = try JSONSerialization.jsonObject(with: data, options: []) as! JSONDict
         } catch {
-            print("JSON parsing failed: \(error)")
+            NSLog("JSON parsing failed: \(error)")
+            NSLog("UUID: \(uuid())")
+            NSLog("Data: \(data)")
             return nil
         }
         
@@ -137,12 +141,8 @@ public class NarodMonAPI {
                           "platform": String(format: "%d.%d.%d", osVersion.majorVersion, osVersion.minorVersion, osVersion.patchVersion)] as [String : Any]
         request.httpBody = toJSONData(dict: postObject)
         
-        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); self.delegate?.appInitiated(app: nil); return}
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-                return
-            }
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {self.delegate?.appInitiated(app: nil); return}
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {return}
             
             if let app = self.appFromAppInit(data: data) {
                 self.delegate?.appInitiated(app: app)
@@ -171,12 +171,8 @@ public class NarodMonAPI {
         }
         request.httpBody = toJSONData(dict: postObject)
         
-        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); self.delegate?.gotLocation(location: nil); return}
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-                return
-            }
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {self.delegate?.gotLocation(location: nil); return}
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {return}
             
             if let loc = self.locationFromUserLocation(data: data) {
                 self.delegate?.gotLocation(location: loc)
@@ -193,7 +189,9 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            print("JSON parsing failed: \(error)")
+            NSLog("JSON parsing failed: \(error)")
+            NSLog("UUID: \(uuid())")
+            NSLog("Data: \(data)")
             return nil
         }
         
@@ -207,7 +205,9 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            print("JSON parsing failed: \(error)")
+            NSLog("JSON parsing failed: \(error)")
+            NSLog("UUID: \(uuid())")
+            NSLog("Data: \(data)")
             return nil
         }
         
@@ -242,12 +242,8 @@ public class NarodMonAPI {
                           "api_key": API_KEY] as [String:Any]
         request.httpBody = toJSONData(dict: postObject)
         
-        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); self.delegate?.gotSensorsList(sensors: nil); return}
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-                return
-            }
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {self.delegate?.gotSensorsList(sensors: nil); return}
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {return}
             
             if let sensors = self.sensorsFromSensorsNearby(data: data) {
                 self.delegate?.gotSensorsList(sensors: sensors)
@@ -264,7 +260,9 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            print("JSON parsing failed: \(error)")
+            NSLog("JSON parsing failed: \(error)")
+            NSLog("UUID: \(uuid())")
+            NSLog("Data: \(data)")
             return nil
         }
         
@@ -292,12 +290,8 @@ public class NarodMonAPI {
                           "sensors": sensors] as [String : Any]
         request.httpBody = toJSONData(dict: postObject)
         
-        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {print("error=\(error)"); self.delegate?.gotSensorsValues(rdgs: nil); return}
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                print("response = \(response)")
-                return
-            }
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {self.delegate?.gotSensorsValues(rdgs: nil); return}
+            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {return}
             
             if let rdgs = self.valuesFromSensorsValues(data: data) {
                 self.delegate?.gotSensorsValues(rdgs: rdgs)

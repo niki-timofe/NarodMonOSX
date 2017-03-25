@@ -46,10 +46,6 @@ extension AppDelegate: CLLocationManagerDelegate {
         locationManager!.stopUpdatingLocation()
     }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
-    }
-    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == CLAuthorizationStatus.authorizedAlways {
             if CLLocationManager.locationServicesEnabled() {
