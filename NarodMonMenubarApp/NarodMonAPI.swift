@@ -271,11 +271,11 @@ public class NarodMonAPI {
         var readings: [Reading] = []
         
         if !(json.keys.contains("sensors")) {
-            return nil                                              //TODO: Error notification
+            return nil
         }
         for sensor in json["sensors"] as! [[String:Any]] {
             if !(sensor.keys.contains("value") && sensor.keys.contains("id") && sensor.keys.contains("time")) {
-                return nil                                          //TODO: Error notification
+                return nil
             }
             readings.append(Reading(value: sensor["value"] as! Float,
                                     sensor: sensor["id"] as! Int,

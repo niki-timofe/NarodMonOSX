@@ -48,11 +48,13 @@ class StatusMenuController: NSObject {
         
         statusMenu.item(withTitle: "Обновить")!.target = self
         statusMenu.item(withTitle: "Выйти")!.target = self
+        updateTimeMenuItem.title = " :  "
         narodMon.delegate = self
         narodMon.appInit()
     }
     
     func updateBtnPress(sender: NSMenuItem) {
+        if app == nil {narodMon.appInit()}
         narodMon.sensorsNearby()
     }
     
@@ -67,10 +69,35 @@ class StatusMenuController: NSObject {
     
 }
 extension StatusMenuController: NarodMonAPIDelegate {
+    func goOffline() {
+        if (offline) {return}
+        offline = true
+        statusItem.title = statusItem.title! + "?"
+    }
+    
+    func goOnline() {
+        offline = false
+    }
+    
+    
     func appInitiated(app: App?) {
+        if (app == nil) {
+            goOffline()
+            return
+        } else {
+            goOnline()
+        }
+        
         self.app = app
     }
     func gotSensorsValues(rdgs: [Reading]?) {
+        if (rdgs == nil) {
+            goOffline()
+            return
+        } else {
+            goOnline()
+        }
+        
         var summs = [Int:Float]()
         var counters = [Int:Int]()
         
@@ -108,8 +135,14 @@ extension StatusMenuController: NarodMonAPIDelegate {
     /// - Parameter sensors: list of nearby sensors
     
     func gotSensorsList(sensors: [Sensor]?) {
-        querySensors = []
+        if (sensors == nil) {
+            goOffline()
+            return
+        } else {
+            goOnline()
+        }
         
+        querySensors = []
         nearbySensors = sensors!
         
         for sensor in sensors! {
@@ -127,6 +160,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
     }
     func gotLocation(location: CLLocation?) {
         self.location = location
+        if app == nil {narodMon.appInit()}
         narodMon.sensorsNearby()
     }
 }

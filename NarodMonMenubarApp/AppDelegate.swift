@@ -26,7 +26,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func wakeUpListener(_ aNotification : NSNotification) {
         Timer.scheduledTimer(withTimeInterval: 30, repeats: false, block: {_ in
-            if (self.locationTimer != nil) {self.locationTimer!.fire()}
+            if (self.locationTimer != nil) {
+                self.controller!.narodMon.appInit()
+                self.locationTimer!.fire()
+            }
         })
     }
     
