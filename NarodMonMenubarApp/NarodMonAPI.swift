@@ -259,7 +259,7 @@ public class NarodMonAPI {
         let postObject = ["cmd": "sensorsNearby",
                           "uuid": uuid(),
                           "pub": 1,
-                          "limit": 3,
+                          "radius": 3,
                           "api_key": API_KEY] as [String:Any]
         request.httpBody = toJSONData(dict: postObject)
         

@@ -19,6 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         locationManager!.delegate = self
         locationManager!.desiredAccuracy = kCLLocationAccuracyKilometer
         locationManager!.distanceFilter = 1000
+        locationManager!.startUpdatingLocation()
+        
         controller = StatusMenuController()
         
         NSWorkspace.shared().notificationCenter.addObserver(self, selector: #selector(AppDelegate.wakeUpListener(_:)), name: NSNotification.Name.NSWorkspaceDidWake, object: nil)
@@ -46,9 +48,14 @@ extension AppDelegate: CLLocationManagerDelegate {
         locationManager!.stopUpdatingLocation()
     }
     
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
+    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        if status == CLAuthorizationStatus.authorizedAlways {
-            if CLLocationManager.locationServicesEnabled() {
+        if CLLocationManager.locationServicesEnabled() {
+            if status == CLAuthorizationStatus.authorizedAlways {
+                
                 if locationTimer != nil {locationTimer?.invalidate()}
                 
                 DispatchQueue.main.async {
@@ -57,6 +64,9 @@ extension AppDelegate: CLLocationManagerDelegate {
                     })
                     self.locationTimer!.fire()
                 }
+            } else {
+                controller!.updateLocation(location: nil)
+                return
             }
         } else {
             controller!.updateLocation(location: nil)

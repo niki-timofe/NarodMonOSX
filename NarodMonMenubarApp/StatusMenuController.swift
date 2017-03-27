@@ -128,9 +128,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
         statusItem.title = String.init(format: "%.1f\u{00B0}", summs[1]! / Float(counters[1]!))
     }
     
-    /// Calls when sensors is emitted
-    ///
-    /// - todo: handle situation when no sensors emitted
+    /// Called when sensors is emitted
     ///
     /// - Parameter sensors: list of nearby sensors
     
