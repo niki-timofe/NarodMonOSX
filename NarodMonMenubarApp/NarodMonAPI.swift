@@ -40,32 +40,31 @@ protocol NarodMonAPIDelegate: NSObjectProtocol {
 }
 
 extension String {
-    var first: String {
-        return String(characters.prefix(1))
-    }
-    var last: String {
-        return String(characters.suffix(1))
-    }
-    var uppercaseFirst: String {
-        return first.uppercased() + String(characters.dropFirst())
-    }
+    var first: String {return String(characters.prefix(1))}
+    var last: String {return String(characters.suffix(1))}
+    var uppercaseFirst: String {return first.uppercased() + String(characters.dropFirst())}
 }
 
 typealias JSONDict = [String:Any]
 
 public class NarodMonAPI {
-    let defaults = UserDefaults.standard
+    private let API_KEY: String!
+    private var request = URLRequest(url: URL(string: "https://narodmon.ru/api")!)
+    private var defaults = UserDefaults.standard
+    
     
     var types: [Type] = []
-    var delegate: NarodMonAPIDelegate?
+    var delegate: NarodMonAPIDelegate!
+    
     
     public init(withAPIKey key: String) {
         API_KEY = key
+        
+        request.httpMethod = "POST"
     }
+
     
-    private var API_KEY: String!
-    private var request = URLRequest(url: URL(string: "https://narodmon.ru/api")!)
-    
+    /// Assistant Functions
     private func MD5(string: String) -> String {
         guard let messageData = string.data(using:String.Encoding.utf8) else { return "" }
         var digestData = Data(count: Int(CC_MD5_DIGEST_LENGTH))
@@ -78,19 +77,6 @@ public class NarodMonAPI {
         
         return digestData.map { String(format: "%02hhx", $0) }.joined()
     }
-    
-    private func uuid() -> String {
-        var uuid = defaults.string(forKey: "UUID")
-        
-        if (uuid == nil) {
-            uuid = UUID().uuidString
-            defaults.setValue(uuid, forKey: "UUID")
-            defaults.synchronize()
-        }
-        
-        return MD5(string: uuid!)
-    }
-    
     private func toJSONData(dict: [String:Any]) -> Data? {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: dict)
@@ -103,8 +89,25 @@ public class NarodMonAPI {
         return nil
     }
     
+    
+    /// UUID getting function
+    ///
+    /// - Returns: generated or saved UUID
+    private func uuid() -> String {
+        var uuid = defaults.string(forKey: "UUID")
+        
+        if (uuid == nil) {
+            uuid = UUID().uuidString
+            defaults.setValue(uuid, forKey: "UUID")
+            defaults.synchronize()
+        }
+        
+        return MD5(string: uuid!)
+    }
+    
+    
+    /// Processing functions
     private func appFromAppInit(data: Data) -> App? {
-        typealias JSONDict = [String:Any]
         let json: JSONDict
         
         do {
@@ -130,77 +133,6 @@ public class NarodMonAPI {
                    lng: json["lng"] as! Float,
                    latest: json["latest"] as! String,
                    url: json["url"] as! String)
-    }
-    
-    public func appInit() {
-        request.httpMethod = "POST"
-        let osVersion = ProcessInfo().operatingSystemVersion
-        let postObject = ["cmd": "appInit",
-                          "uuid": uuid(),
-                          "api_key": API_KEY,
-                          "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String,
-                          "lang": "ru",
-                          "platform": String(format: "%d.%d.%d", osVersion.majorVersion, osVersion.minorVersion, osVersion.patchVersion)] as [String : Any]
-        request.httpBody = toJSONData(dict: postObject)
-        
-        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-                NSLog("HTTP error: \(error)")
-                NSLog("UUID: \(self.uuid())")
-                self.delegate?.appInitiated(app: nil)
-                return
-            }
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                NSLog("HTTP got status code: \(httpStatus.statusCode)")
-                NSLog("UUID: \(self.uuid())")
-                return
-            }
-            
-            if let app = self.appFromAppInit(data: data) {
-                self.delegate?.appInitiated(app: app)
-            }
-        }
-        task.resume()
-    }
-    
-    public func userLocation(location: CLLocation?) {
-        request.httpMethod = "POST"
-        
-        let postObject: [String: Any]
-        
-        if (location != nil) {
-            postObject = ["cmd": "userLocation",
-                          "uuid": uuid(),
-                          "api_key": API_KEY,
-                          "lang": "ru",
-                          "lat": location!.coordinate.latitude,
-                          "lng": location!.coordinate.longitude]
-        } else {
-            postObject = ["cmd": "userLocation",
-                          "uuid": uuid(),
-                          "api_key": API_KEY,
-                          "lang": "ru"]
-        }
-        request.httpBody = toJSONData(dict: postObject)
-        
-        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-            self.delegate?.gotLocation(location: nil)
-            NSLog("HTTP error: \(error)")
-            NSLog("UUID: \(self.uuid())")
-            return
-            }
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                NSLog("HTTP got status code: \(httpStatus.statusCode)")
-                NSLog("UUID: \(self.uuid())")
-                NSLog("Data: \(data)")
-                return
-            }
-            
-            if let loc = self.locationFromUserLocation(data: data) {
-                self.delegate?.gotLocation(location: loc)
-            }
-        }
-        task.resume()
-        
     }
     
     private func locationFromUserLocation(data: Data) -> CLLocation? {
@@ -255,34 +187,6 @@ public class NarodMonAPI {
         return senss
     }
     
-    public func sensorsNearby() {
-        let postObject = ["cmd": "sensorsNearby",
-                          "uuid": uuid(),
-                          "pub": 1,
-                          "radius": 3,
-                          "api_key": API_KEY] as [String:Any]
-        request.httpBody = toJSONData(dict: postObject)
-        
-        let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-            self.delegate?.gotSensorsList(sensors: nil)
-            NSLog("HTTP error: \(error)")
-            NSLog("UUID: \(self.uuid())")
-            return
-            }
-            if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                NSLog("HTTP got status code: \(httpStatus.statusCode)")
-                NSLog("UUID: \(self.uuid())")
-                NSLog("Data: \(data)")
-                return
-            }
-            
-            if let sensors = self.sensorsFromSensorsNearby(data: data) {
-                self.delegate?.gotSensorsList(sensors: sensors)
-            }
-        }
-        task.resume()
-    }
-    
     private func valuesFromSensorsValues(data: Data) -> [Reading]? {
         typealias JSONDict = [String:Any]
         let json: JSONDict
@@ -314,31 +218,95 @@ public class NarodMonAPI {
         return readings
     }
     
-    public func sensorsValues(sensors: [Int]) {
-        let postObject = ["cmd": "sensorsValues",
+    
+    /// API Functions
+    public func appInit() {
+        let osVersion = ProcessInfo().operatingSystemVersion
+        
+        post(object: ["cmd": "appInit",
+                      "uuid": uuid(),
+                      "api_key": API_KEY,
+                      "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String,
+                      "lang": "ru",
+                      "platform": String(format: "%d.%d.%d",
+                                         osVersion.majorVersion,
+                                         osVersion.minorVersion,
+                                         osVersion.patchVersion)],
+             processWith: appFromAppInit) { (app: Any?) -> () in
+                self.delegate?.appInitiated(app: app as! App?)
+        }
+    }
+    
+    public func userLocation(location: CLLocation?) {
+        let postObject: [String: Any]
+        
+        if (location != nil) {
+            postObject = ["cmd": "userLocation",
                           "uuid": uuid(),
                           "api_key": API_KEY,
-                          "sensors": sensors] as [String : Any]
+                          "lang": "ru",
+                          "lat": location!.coordinate.latitude,
+                          "lng": location!.coordinate.longitude]
+        } else {
+            postObject = ["cmd": "userLocation",
+                          "uuid": uuid(),
+                          "api_key": API_KEY,
+                          "lang": "ru"]
+        }
+        
+        post(object: postObject,
+             processWith: locationFromUserLocation) { (location: Any?) -> () in
+                self.delegate?.gotLocation(location: location as? CLLocation)
+        }
+    }
+    
+    public func sensorsNearby() {
+        post(object: ["cmd": "sensorsNearby",
+                      "uuid": uuid(),
+                      "pub": 1,
+                      "radius": 5,
+                      "api_key": API_KEY],
+             processWith: sensorsFromSensorsNearby) { (sensors: Any?) -> () in
+                self.delegate?.gotSensorsList(sensors: sensors as! [Sensor]?)
+        }
+    }
+    
+    public func sensorsValues(sensors: [Int]) {
+        post(object: ["cmd": "sensorsValues",
+                      "uuid": uuid(),
+                      "api_key": API_KEY,
+                      "sensors": sensors],
+             processWith: valuesFromSensorsValues) { (rdgs: Any?) -> () in
+                self.delegate?.gotSensorsValues(rdgs: rdgs as! [Reading]?)
+        }
+    }
+    
+    
+    /// HTTP POST Function
+    ///
+    /// - Parameters:
+    ///   - postObject: Dictionary to post
+    ///   - process: Function which will process recieved Data
+    ///   - delegated: Delegate function, where processed data will be returned
+    private func post(object postObject: [String : Any],  processWith process: @escaping (_ data: Data) -> Any?,  delegated: @escaping (_: Any?) -> ()) {
         request.httpBody = toJSONData(dict: postObject)
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-            self.delegate?.gotSensorsValues(rdgs: nil)
             NSLog("HTTP error: \(error)")
             NSLog("UUID: \(self.uuid())")
+            delegated(_: nil)
             return
             }
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
                 NSLog("HTTP got status code: \(httpStatus.statusCode)")
                 NSLog("UUID: \(self.uuid())")
-                NSLog("Data: \(data)")
                 return
             }
             
-            if let rdgs = self.valuesFromSensorsValues(data: data) {
-                self.delegate?.gotSensorsValues(rdgs: rdgs)
+            if let processed = process(data) {
+                delegated(_: processed)
             }
         }
         task.resume()
     }
-    
 }
