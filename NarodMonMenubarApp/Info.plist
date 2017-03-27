@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>ru</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
@@ -19,7 +19,9 @@
 	<key>CFBundleShortVersionString</key>
 	<string>3.0.0-alpha</string>
 	<key>CFBundleVersion</key>
-	<string>2</string>
+	<string>24</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.weather</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>LSUIElement</key>
