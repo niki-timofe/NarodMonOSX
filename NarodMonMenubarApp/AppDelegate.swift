@@ -17,7 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         locationManager = CLLocationManager()
         locationManager!.delegate = self
-        locationManager!.desiredAccuracy = kCLLocationAccuracyKilometer
+        locationManager!.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager!.distanceFilter = 1000
         locationManager!.startUpdatingLocation()
         
