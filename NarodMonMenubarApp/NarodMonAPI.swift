@@ -54,6 +54,8 @@ extension String {
 typealias JSONDict = [String:Any]
 
 public class NarodMonAPI {
+    let defaults = UserDefaults.standard
+    
     var types: [Type] = []
     var delegate: NarodMonAPIDelegate?
     
@@ -78,12 +80,12 @@ public class NarodMonAPI {
     }
     
     private func uuid() -> String {
-        let defaults = UserDefaults.standard
         var uuid = defaults.string(forKey: "UUID")
         
         if (uuid == nil) {
             uuid = UUID().uuidString
             defaults.setValue(uuid, forKey: "UUID")
+            defaults.synchronize()
         }
         
         return MD5(string: uuid!)
