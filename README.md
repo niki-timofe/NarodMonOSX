@@ -1,8 +1,7 @@
 # NarodMonOSX
 
-![Главное меню виджета](https://cloud.githubusercontent.com/assets/1268517/11258290/f328d92c-8e68-11e5-80bc-df5a5b8e48c2.png)
+![v3.0.0-alpha](https://cloud.githubusercontent.com/assets/1268517/24340494/338a87c2-12bb-11e7-9502-ba973b2d3d09.png)
 
 Виджет Народного Мониторинга для OS X
-<hr>
 
 > Свежая версия всегда здесь: https://github.com/niki-timofe/NarodMonOSX/releases/latest
