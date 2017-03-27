@@ -17,7 +17,7 @@
 /* Begin PBXFileReference section */
 		112636A51E82EF5800599AB0 /* StatusMenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusMenuController.swift; sourceTree = "<group>"; };
 		112636A71E82F20300599AB0 /* NarodMonAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NarodMonAPI.swift; sourceTree = "<group>"; };
-		112636AD1E82F38E00599AB0 /* BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BridgingHeader.h; path = ../BridgingHeader.h; sourceTree = "<group>"; };
+		11775E9C1E88AB2D00EB88B0 /* BridgingHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		117CA21D1E8317E400FC406C /* NarodMonMenubarApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NarodMonMenubarApp.entitlements; sourceTree = "<group>"; };
 		11A3D1DB1E82CE5D00E7163D /* NarodMonMenubarApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NarodMonMenubarApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11A3D1DE1E82CE5D00E7163D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -57,7 +57,7 @@
 			isa = PBXGroup;
 			children = (
 				117CA21D1E8317E400FC406C /* NarodMonMenubarApp.entitlements */,
-				112636AD1E82F38E00599AB0 /* BridgingHeader.h */,
+				11775E9C1E88AB2D00EB88B0 /* BridgingHeader.h */,
 				112636A71E82F20300599AB0 /* NarodMonAPI.swift */,
 				112636A51E82EF5800599AB0 /* StatusMenuController.swift */,
 				11A3D1DE1E82CE5D00E7163D /* AppDelegate.swift */,
@@ -291,7 +291,6 @@
 				CODE_SIGN_ENTITLEMENTS = NarodMonMenubarApp/NarodMonMenubarApp.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = K8RU6J728Q;
 				INFOPLIST_FILE = NarodMonMenubarApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
