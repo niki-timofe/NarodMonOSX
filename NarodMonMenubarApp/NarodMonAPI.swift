@@ -292,7 +292,7 @@ public class NarodMonAPI {
         request.httpBody = toJSONData(dict: postObject)
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-            NSLog("HTTP error: \(error)")
+            NSLog("HTTP error: \(String(describing: error))")
             NSLog("UUID: \(self.uuid())")
             delegated(_: nil)
             return
