@@ -50,7 +50,7 @@ typealias JSONDict = [String:Any]
 public class NarodMonAPI {
     private let API_KEY: String!
     private var request = URLRequest(url: URL(string: "https://narodmon.ru/api")!)
-    private var defaults = UserDefaults.standard
+    private var keychain = KeychainSwift()
     
     
     var types: [Type] = []
@@ -59,7 +59,7 @@ public class NarodMonAPI {
     
     public init(withAPIKey key: String) {
         API_KEY = key
-        
+        keychain.synchronizable = true
         request.httpMethod = "POST"
     }
 
@@ -94,12 +94,11 @@ public class NarodMonAPI {
     ///
     /// - Returns: generated or saved UUID
     private func uuid() -> String {
-        var uuid = defaults.string(forKey: "UUID")
+        var uuid = keychain.get("UUID")
         
         if (uuid == nil) {
             uuid = UUID().uuidString
-            defaults.setValue(uuid, forKey: "UUID")
-            defaults.synchronize()
+            keychain.set(uuid!, forKey: "UUID", withAccess: .accessibleAlways)
         }
         
         return MD5(string: uuid!)
@@ -226,7 +225,7 @@ public class NarodMonAPI {
         post(object: ["cmd": "appInit",
                       "uuid": uuid(),
                       "api_key": API_KEY,
-                      "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String,
+                      "version": "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String) (\(Bundle.main.infoDictionary?["CFBundleVersion"] as! String))",
                       "lang": "ru",
                       "platform": String(format: "%d.%d.%d",
                                          osVersion.majorVersion,

@@ -21,6 +21,7 @@ class StatusMenuController: NSObject {
     
     var readingsMenuItems: [NSMenuItem] = []
     
+    var updateAlert = NSAlert()
     
     var location: CLLocation?
     var fetchTimer: Timer?
@@ -28,6 +29,7 @@ class StatusMenuController: NSObject {
     
     var nearbySensors: [Sensor] = []
     var offline: Bool = true
+    var supressUpdateDialog: Bool = false
     var app: App?
     
     override init() {
@@ -51,6 +53,13 @@ class StatusMenuController: NSObject {
         updateTimeMenuItem.title = " :  "
         narodMon.delegate = self
         narodMon.appInit()
+        
+        updateAlert.messageText = "Доступна новая версия"
+        updateAlert.informativeText = "Доступна новая версия приложения. Загрузить сейчас?"
+        updateAlert.alertStyle = NSAlertStyle.warning
+        updateAlert.showsSuppressionButton = true
+        updateAlert.addButton(withTitle: "Загрузить")
+        updateAlert.addButton(withTitle: "Отменить")
     }
     
     func updateBtnPress(sender: NSMenuItem) {
@@ -87,11 +96,23 @@ extension StatusMenuController: NarodMonAPIDelegate {
         } else {
             goOnline()
         }
-        
         self.app = app
+        
+        if (UInt16(app!.latest) ?? UInt16.max <= UInt16(Bundle.main.infoDictionary?["CFBundleVersion"] as! String)!) {return;}
+        
+
+        DispatchQueue.main.async {
+            if !self.supressUpdateDialog && self.updateAlert.runModal() == NSAlertFirstButtonReturn {
+                if let url = URL(string: "https://github.com/niki-timofe/NarodMonOSX/releases/latest"), NSWorkspace.shared().open(url) {
+                    NSApp.terminate(self.updateAlert)
+                }
+            } else {
+                self.supressUpdateDialog = self.updateAlert.suppressionButton?.state == NSOnState
+            }
+        }
     }
     func gotSensorsValues(rdgs: [Reading]?) {
-        if (rdgs == nil) {
+        if rdgs == nil {
             goOffline()
             return
         } else {
