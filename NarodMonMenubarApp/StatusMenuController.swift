@@ -98,19 +98,22 @@ extension StatusMenuController: NarodMonAPIDelegate {
         }
         self.app = app
         
-        if (UInt16(app!.latest) ?? UInt16.max <= UInt16(Bundle.main.infoDictionary?["CFBundleVersion"] as! String)!) {return;}
+        let latestVersion = app!.latest
+        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
         
-
-        DispatchQueue.main.async {
-            if !self.supressUpdateDialog && self.updateAlert.runModal() == NSAlertFirstButtonReturn {
-                if let url = URL(string: "https://github.com/niki-timofe/NarodMonOSX/releases/latest"), NSWorkspace.shared().open(url) {
-                    NSApp.terminate(self.updateAlert)
+        if (latestVersion.compare(currentVersion, options: NSString.CompareOptions.numeric) == ComparisonResult.orderedDescending) {
+            DispatchQueue.main.async {
+                if !self.supressUpdateDialog && self.updateAlert.runModal() == NSAlertFirstButtonReturn {
+                    if let url = URL(string: "https://github.com/niki-timofe/NarodMonOSX/releases/latest"), NSWorkspace.shared().open(url) {
+                        NSApp.terminate(self.updateAlert)
+                    }
+                } else {
+                    self.supressUpdateDialog = self.updateAlert.suppressionButton?.state == NSOnState
                 }
-            } else {
-                self.supressUpdateDialog = self.updateAlert.suppressionButton?.state == NSOnState
             }
         }
     }
+    
     func gotSensorsValues(rdgs: [Reading]?) {
         if rdgs == nil {
             goOffline()
