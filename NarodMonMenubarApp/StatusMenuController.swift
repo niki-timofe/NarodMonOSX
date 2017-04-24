@@ -13,18 +13,20 @@ import CoreLocation
 class StatusMenuController: NSObject {
     let statusItem: NSStatusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
     let narodMon: NarodMonAPI
+    let userDefaults: UserDefaults = UserDefaults.standard
     
     let formatter = DateFormatter()
     
-    var statusMenu: NSMenu = NSMenu()
+    let statusMenu: NSMenu = NSMenu()
     let updateTimeMenuItem: NSMenuItem = NSMenuItem()
     
     var readingsMenuItems: [NSMenuItem] = []
     
-    var updateAlert = NSAlert()
+    let updateAlert = NSAlert()
     
     var location: CLLocation?
     var fetchTimer: Timer?
+    var wake: Date? = nil;
     var querySensors: [Int] = []
     
     var nearbySensors: [Sensor] = []
@@ -63,7 +65,7 @@ class StatusMenuController: NSObject {
     }
     
     func updateBtnPress(sender: NSMenuItem) {
-        if app == nil {narodMon.appInit()}
+        if app == nil || offline {narodMon.appInit()}
         narodMon.sensorsNearby()
     }
     
@@ -93,9 +95,16 @@ extension StatusMenuController: NarodMonAPIDelegate {
         if (app == nil) {
             goOffline()
             return
-        } else {
-            goOnline()
         }
+        
+        if wake != nil {
+            userDefaults.set((userDefaults.double(forKey: "UpdateAfterWake") + Date().timeIntervalSince(wake!)) / 2, forKey: "UpdateAfterWake")
+            NSLog("New UpdateAfterWake interval: \(userDefaults.double(forKey: "UpdateAfterWake"))")
+            userDefaults.synchronize()
+        }
+            
+        goOnline()
+
         self.app = app
         
         let latestVersion = app!.latest

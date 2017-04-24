@@ -288,17 +288,18 @@ public class NarodMonAPI {
     ///   - process: Function which will process recieved Data
     ///   - delegated: Delegate function, where processed data will be returned
     private func post(object postObject: [String : Any],  processWith process: @escaping (_ data: Data) -> Any?,  delegated: @escaping (_: Any?) -> ()) {
-        request.httpBody = toJSONData(dict: postObject)
+        let requestBody = toJSONData(dict: postObject)
+        request.httpBody = requestBody
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-            NSLog("HTTP error: \(String(describing: error))")
-            NSLog("UUID: \(self.uuid())")
+            NSLog("HTTP error: \(String(describing: error))\n" +
+                "for request: \(String.init(data: requestBody!, encoding: String.Encoding.utf8) ?? "nil")")
             delegated(_: nil)
             return
             }
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                NSLog("HTTP got status code: \(httpStatus.statusCode)")
-                NSLog("UUID: \(self.uuid())")
+                NSLog("HTTP got status code: \(httpStatus.statusCode)\n" +
+                    "for request: \(String.init(data: requestBody!, encoding: String.Encoding.utf8) ?? "nil")")
                 return
             }
             

@@ -13,6 +13,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var locationManager: CLLocationManager?
     var controller: StatusMenuController?
     var locationTimer: Timer?
+    var userDefaults: UserDefaults = UserDefaults.standard
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         locationManager = CLLocationManager()
@@ -27,7 +28,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func wakeUpListener(_ aNotification : NSNotification) {
-        Timer.scheduledTimer(withTimeInterval: 30, repeats: false, block: {_ in
+        self.controller!.wake = Date()
+        Timer.scheduledTimer(withTimeInterval: userDefaults.double(forKey: "UpdateAfterWake"), repeats: false, block: {_ in
             if (self.locationTimer != nil) {
                 self.controller!.narodMon.appInit()
                 self.locationTimer!.fire()
