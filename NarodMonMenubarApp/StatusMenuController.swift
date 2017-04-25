@@ -4,7 +4,6 @@
 //
 //  Created by Никита Тимофеев on 22.03.17.
 //  Copyright © 2017 Nikita Timofeev. All rights reserved.
-//
 
 import Cocoa
 import Foundation
@@ -14,7 +13,6 @@ class StatusMenuController: NSObject {
     let statusItem: NSStatusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
     let narodMon: NarodMonAPI
     let userDefaults: UserDefaults = UserDefaults.standard
-    
     let formatter = DateFormatter()
     
     let statusMenu: NSMenu = NSMenu()
@@ -26,8 +24,13 @@ class StatusMenuController: NSObject {
     
     var location: CLLocation?
     var fetchTimer: Timer?
-    var wake: Date? = nil;
+    var retryCount: Int = 0
     var querySensors: [Int] = []
+    
+    var wake: Date? = nil
+    var latestNearby: Date? = nil
+    var latestValues: Date? = nil
+    var latestLocation: Date? = nil
     
     var nearbySensors: [Sensor] = []
     var offline: Bool = true
@@ -52,8 +55,8 @@ class StatusMenuController: NSObject {
         
         statusMenu.item(withTitle: "Обновить")!.target = self
         statusMenu.item(withTitle: "Выйти")!.target = self
-        updateTimeMenuItem.title = " :  "
         narodMon.delegate = self
+        NSLog("[API]: Trying \"appInit\"")
         narodMon.appInit()
         
         updateAlert.messageText = "Доступна новая версия"
@@ -65,8 +68,8 @@ class StatusMenuController: NSObject {
     }
     
     func updateBtnPress(sender: NSMenuItem) {
-        if app == nil || offline {narodMon.appInit()}
-        narodMon.sensorsNearby()
+        NSLog("Force update from \"updateBtn\"")
+        _ = requestLocationUpdate(force: true)
     }
     
     func quitBtnPress(sender: NSMenuItem) {
@@ -74,8 +77,28 @@ class StatusMenuController: NSObject {
     }
     
     func updateLocation(location: CLLocation?) {
-        self.location = location
+        NSLog("[API]: Trying \"userLocation\" with \(String(describing: location))")
         narodMon.userLocation(location: location)
+    }
+    
+    //Periodic tasks
+    
+    func requestLocationUpdate(force: Bool = true) -> Bool {
+        if !(force || Date().timeIntervalSince(latestLocation ?? Date(timeIntervalSince1970: 0)) > 30 * 60) {return false}
+        NSLog("Requesting location update from \"locationManager\"")
+        delegate.locationManager!.startUpdatingLocation()
+        return true
+    }
+    
+    func requestSensorsNearbyUpdate(force: Bool = true) {
+        NSLog("[API]: Trying \"sensorsNearby\"")
+        narodMon.sensorsNearby()
+    }
+    
+    func requestSensorsValuesUpdate(force: Bool = true) {
+        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > 7.5 * 60) {return}
+        NSLog("[API]: Trying \"sensorsValues\"")
+        narodMon.sensorsValues(sensors: self.querySensors)
     }
     
 }
@@ -90,25 +113,43 @@ extension StatusMenuController: NarodMonAPIDelegate {
         offline = false
     }
     
-    
     func appInitiated(app: App?) {
         if (app == nil) {
             goOffline()
+
+            if retryCount < 3 {
+                NSLog("Will retry \"appInit\" #\(retryCount + 1)")
+                DispatchQueue.main.async {
+                    Timer.scheduledTimer(withTimeInterval: 10, repeats: false, block: {_ in
+                        NSLog("[API]: Trying \"appInit\"")
+                        self.narodMon.appInit()
+                    })
+                }
+                retryCount += 1
+            }
             return
         }
         
-        if wake != nil {
-            userDefaults.set((userDefaults.double(forKey: "UpdateAfterWake") + Date().timeIntervalSince(wake!)) / 2, forKey: "UpdateAfterWake")
-            NSLog("New UpdateAfterWake interval: \(userDefaults.double(forKey: "UpdateAfterWake"))")
-            userDefaults.synchronize()
-        }
-            
-        goOnline()
-
+        NSLog("\"appInit\" success")
         self.app = app
+        retryCount = 0
         
-        let latestVersion = app!.latest
-        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+        if wake != nil {
+            let successUpdateAfterWake = Date().timeIntervalSince(wake!),
+            newUpdateAfterWakeInterval = (userDefaults.double(forKey: "UpdateAfterWake") + successUpdateAfterWake) / 2 * 0.85
+            
+            userDefaults.set(newUpdateAfterWakeInterval, forKey: "UpdateAfterWake")
+            userDefaults.synchronize()
+            
+            NSLog("Sucessful \"appInit\" after wake in \(successUpdateAfterWake)s new UpdateAfterWake interval: \(newUpdateAfterWakeInterval)s")
+            
+
+            wake = nil;
+        }
+        
+        
+        let latestVersion = self.app!.latest
+        let currentVersion = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String
         
         if (latestVersion.compare(currentVersion, options: NSString.CompareOptions.numeric) == ComparisonResult.orderedDescending) {
             DispatchQueue.main.async {
@@ -121,15 +162,32 @@ extension StatusMenuController: NarodMonAPIDelegate {
                 }
             }
         }
+        
+        if fetchTimer != nil {
+            fetchTimer!.invalidate()
+        }
+        
+        DispatchQueue.main.async {
+            self.fetchTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(60), repeats: true, block: {_ in
+                if !self.requestLocationUpdate(force: false) {
+                    _ = self.requestSensorsValuesUpdate(force: false)
+                }
+            })
+            self.fetchTimer!.fire()
+        }
     }
     
     func gotSensorsValues(rdgs: [Reading]?) {
         if rdgs == nil {
+            NSLog("\"sensorsValues\" failed")
             goOffline()
             return
         } else {
+            NSLog("\"sensorsValues\" success")
+            latestValues = Date()
             goOnline()
         }
+        
         
         var summs = [Int:Float]()
         var counters = [Int:Int]()
@@ -164,34 +222,35 @@ extension StatusMenuController: NarodMonAPIDelegate {
     /// Called when sensors is emitted
     ///
     /// - Parameter sensors: list of nearby sensors
-    
     func gotSensorsList(sensors: [Sensor]?) {
         if (sensors == nil) {
+            NSLog("\"sensorsNearby\" failed")
             goOffline()
             return
         } else {
-            goOnline()
+            NSLog("\"sensorsNearby\" success")
+            latestNearby = Date()
         }
         
         querySensors = []
         nearbySensors = sensors!
         
-        for sensor in sensors! {
+        for sensor in nearbySensors {
             querySensors.append(sensor.id)
         }
         
-        if (fetchTimer != nil) {fetchTimer?.invalidate()}
-        
-        DispatchQueue.main.async {
-            self.fetchTimer = Timer.scheduledTimer(withTimeInterval: 7.5 * 60, repeats: true, block: {_ in
-                self.narodMon.sensorsValues(sensors: self.querySensors)
-            })
-            self.fetchTimer!.fire()
-        }
+        _ = requestSensorsValuesUpdate()
     }
+    
     func gotLocation(location: CLLocation?) {
+        if location == nil {
+            NSLog("Failed to get new location")
+        }
+        
+        NSLog("Got new location: \(String(describing: location))")
+        latestLocation = Date()
+        
         self.location = location
-        if app == nil {narodMon.appInit()}
-        narodMon.sensorsNearby()
+        requestSensorsNearbyUpdate()
     }
 }

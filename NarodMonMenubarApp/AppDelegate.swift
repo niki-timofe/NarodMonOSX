@@ -20,20 +20,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         locationManager!.delegate = self
         locationManager!.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager!.distanceFilter = 1000
-        locationManager!.startUpdatingLocation()
         
         controller = StatusMenuController()
         
-        NSWorkspace.shared().notificationCenter.addObserver(self, selector: #selector(AppDelegate.wakeUpListener(_:)), name: NSNotification.Name.NSWorkspaceDidWake, object: nil)
+        NSWorkspace.shared().notificationCenter.addObserver(self, selector: #selector(AppDelegate.wakeListener(_:)), name: NSNotification.Name.NSWorkspaceDidWake, object: nil)
+        NSWorkspace.shared().notificationCenter.addObserver(self, selector: #selector(AppDelegate.sleepListener(_:)), name: NSNotification.Name.NSWorkspaceWillSleep, object: nil)
     }
     
-    func wakeUpListener(_ aNotification : NSNotification) {
+    func sleepListener(_ aNotification: NSNotification) {
+        self.controller!.goOffline()
+        self.controller!.wake = nil
+        if self.controller!.fetchTimer != nil {self.controller!.fetchTimer!.invalidate()}
+        locationManager!.stopUpdatingLocation()
+    }
+    
+    func wakeListener(_ aNotification: NSNotification) {
+        self.controller!.goOffline()
         self.controller!.wake = Date()
         Timer.scheduledTimer(withTimeInterval: userDefaults.double(forKey: "UpdateAfterWake"), repeats: false, block: {_ in
-            if (self.locationTimer != nil) {
-                self.controller!.narodMon.appInit()
-                self.locationTimer!.fire()
-            }
+            self.controller!.narodMon.appInit()
         })
     }
     
@@ -44,34 +49,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 extension AppDelegate: CLLocationManagerDelegate {
-    
     func locationManager(_ manager: CLLocationManager, didUpdateTo newLocation: CLLocation, from oldLocation: CLLocation) {
-        controller!.updateLocation(location: newLocation)
         locationManager!.stopUpdatingLocation()
+        NSLog("Got location from \"locationManager\"")
+        controller!.updateLocation(location: newLocation)
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
+        NSLog("\"locationManager\" error: \(error), calling controller's \"updateLocation\" with nil argument")
+        controller!.updateLocation(location: nil)
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if CLLocationManager.locationServicesEnabled() {
             if status == CLAuthorizationStatus.authorizedAlways {
-                
-                if locationTimer != nil {locationTimer?.invalidate()}
-                
-                DispatchQueue.main.async {
-                    self.locationTimer = Timer.scheduledTimer(withTimeInterval: 30 * 60, repeats: true, block: {_ in
-                        self.locationManager!.startUpdatingLocation()
-                    })
-                    self.locationTimer!.fire()
-                }
-            } else {
-                controller!.updateLocation(location: nil)
-                return
+                self.locationManager!.startUpdatingLocation()
             }
-        } else {
-            controller!.updateLocation(location: nil)
         }
     }
 }
