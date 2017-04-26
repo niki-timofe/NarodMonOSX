@@ -28,6 +28,7 @@ class StatusMenuController: NSObject {
     var querySensors: [Int] = []
     
     var wake: Date? = nil
+    var latestAppInit: Date? = nil
     var latestNearby: Date? = nil
     var latestValues: Date? = nil
     var latestLocation: Date? = nil
@@ -83,6 +84,13 @@ class StatusMenuController: NSObject {
     
     //Periodic tasks
     
+    func requestAppInitUpdate(force: Bool = true) -> Bool {
+        if !(force || Date().timeIntervalSince(latestAppInit ?? Date(timeIntervalSince1970: 0)) > 24 * 60 * 60) {return false}
+        NSLog("[API]: Trying \"appInit\"")
+        narodMon.appInit()
+        return true
+    }
+    
     func requestLocationUpdate(force: Bool = true) -> Bool {
         if !(force || Date().timeIntervalSince(latestLocation ?? Date(timeIntervalSince1970: 0)) > 30 * 60) {return false}
         NSLog("Requesting location update from \"locationManager\"")
@@ -105,6 +113,7 @@ class StatusMenuController: NSObject {
 extension StatusMenuController: NarodMonAPIDelegate {
     func goOffline() {
         if (offline) {return}
+        NSLog("Going offline")
         offline = true
         statusItem.title = statusItem.title! + "?"
     }
@@ -117,20 +126,18 @@ extension StatusMenuController: NarodMonAPIDelegate {
         if (app == nil) {
             goOffline()
 
-            if retryCount < 3 {
-                NSLog("Will retry \"appInit\" #\(retryCount + 1)")
-                DispatchQueue.main.async {
-                    Timer.scheduledTimer(withTimeInterval: 10, repeats: false, block: {_ in
-                        NSLog("[API]: Trying \"appInit\"")
-                        self.narodMon.appInit()
-                    })
-                }
-                retryCount += 1
+            NSLog("Will retry \"appInit\" #\(retryCount + 1)")
+            DispatchQueue.main.async {
+                Timer.scheduledTimer(withTimeInterval: self.retryCount < 3 ? 10 : (10 * 60), repeats: false, block: {_ in
+                    _ = self.requestAppInitUpdate()
+                })
             }
+            retryCount += 1
             return
         }
         
         NSLog("\"appInit\" success")
+        latestAppInit = Date()
         self.app = app
         retryCount = 0
         
@@ -169,8 +176,10 @@ extension StatusMenuController: NarodMonAPIDelegate {
         
         DispatchQueue.main.async {
             self.fetchTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(60), repeats: true, block: {_ in
-                if !self.requestLocationUpdate(force: false) {
-                    _ = self.requestSensorsValuesUpdate(force: false)
+                if !self.requestAppInitUpdate(force: false) {
+                    if !self.requestLocationUpdate(force: false) {
+                        _ = self.requestSensorsValuesUpdate(force: false)
+                    }
                 }
             })
             self.fetchTimer!.fire()

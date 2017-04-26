@@ -292,7 +292,7 @@ public class NarodMonAPI {
         request.httpBody = requestBody
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-            NSLog("HTTP error: \(String(describing: error))\n" +
+            NSLog("HTTP error: \(String(describing: error?.localizedDescription))\n" +
                 "for request: \(String.init(data: requestBody!, encoding: String.Encoding.utf8) ?? "nil")")
             delegated(_: nil)
             return
