@@ -82,9 +82,7 @@ public class NarodMonAPI {
             let jsonData = try JSONSerialization.data(withJSONObject: dict)
             return jsonData
         } catch {
-            NSLog("JSON parsing failed: \(error.localizedDescription)")
-            NSLog("UUID: \(uuid())")
-            NSLog("Data: \(dict)")
+            NSLog("[API][JSON]: parsing failed: \(error.localizedDescription), UUID: \(uuid()), Data: \(dict)")
         }
         return nil
     }
@@ -112,9 +110,7 @@ public class NarodMonAPI {
         do {
             json = try JSONSerialization.jsonObject(with: data, options: []) as! JSONDict
         } catch {
-            NSLog("JSON parsing failed: \(error)")
-            NSLog("UUID: \(uuid())")
-            NSLog("Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
             return nil
         }
         
@@ -141,9 +137,7 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            NSLog("JSON parsing failed: \(error)")
-            NSLog("UUID: \(uuid())")
-            NSLog("Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
             return nil
         }
         
@@ -157,9 +151,7 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            NSLog("JSON parsing failed: \(error)")
-            NSLog("UUID: \(uuid())")
-            NSLog("Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
             return nil
         }
         
@@ -194,9 +186,7 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            NSLog("JSON parsing failed: \(error)")
-            NSLog("UUID: \(uuid())")
-            NSLog("Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
             return nil
         }
         
@@ -289,16 +279,17 @@ public class NarodMonAPI {
     ///   - delegated: Delegate function, where processed data will be returned
     private func post(object postObject: [String : Any],  processWith process: @escaping (_ data: Data) -> Any?,  delegated: @escaping (_: Any?) -> ()) {
         let requestBody = toJSONData(dict: postObject)
+        NSLog("[API]: Trying \"\(postObject["cmd"] ?? "nil")\"")
         request.httpBody = requestBody
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
-            NSLog("HTTP error: \(String(describing: error?.localizedDescription))\n" +
+            NSLog("[API][HTTP]: error: \(String(describing: error!.localizedDescription))\n" +
                 "for request: \(String.init(data: requestBody!, encoding: String.Encoding.utf8) ?? "nil")")
             delegated(_: nil)
             return
             }
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
-                NSLog("HTTP got status code: \(httpStatus.statusCode)\n" +
+                NSLog("[API][HTTP]: got status code: \(httpStatus.statusCode)\n" +
                     "for request: \(String.init(data: requestBody!, encoding: String.Encoding.utf8) ?? "nil")")
                 return
             }

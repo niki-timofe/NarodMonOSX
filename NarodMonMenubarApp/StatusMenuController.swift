@@ -57,7 +57,6 @@ class StatusMenuController: NSObject {
         statusMenu.item(withTitle: "Обновить")!.target = self
         statusMenu.item(withTitle: "Выйти")!.target = self
         narodMon.delegate = self
-        NSLog("[API]: Trying \"appInit\"")
         narodMon.appInit()
         
         updateAlert.messageText = "Доступна новая версия"
@@ -78,7 +77,6 @@ class StatusMenuController: NSObject {
     }
     
     func updateLocation(location: CLLocation?) {
-        NSLog("[API]: Trying \"userLocation\" with \(String(describing: location))")
         narodMon.userLocation(location: location)
     }
     
@@ -86,7 +84,6 @@ class StatusMenuController: NSObject {
     
     func requestAppInitUpdate(force: Bool = true) -> Bool {
         if !(force || Date().timeIntervalSince(latestAppInit ?? Date(timeIntervalSince1970: 0)) > 24 * 60 * 60) {return false}
-        NSLog("[API]: Trying \"appInit\"")
         narodMon.appInit()
         return true
     }
@@ -99,13 +96,11 @@ class StatusMenuController: NSObject {
     }
     
     func requestSensorsNearbyUpdate(force: Bool = true) {
-        NSLog("[API]: Trying \"sensorsNearby\"")
         narodMon.sensorsNearby()
     }
     
     func requestSensorsValuesUpdate(force: Bool = true) {
         if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > 7.5 * 60) {return}
-        NSLog("[API]: Trying \"sensorsValues\"")
         narodMon.sensorsValues(sensors: self.querySensors)
     }
     
@@ -149,8 +144,6 @@ extension StatusMenuController: NarodMonAPIDelegate {
             userDefaults.synchronize()
             
             NSLog("Sucessful \"appInit\" after wake in \(successUpdateAfterWake)s new UpdateAfterWake interval: \(newUpdateAfterWakeInterval)s")
-            
-
             wake = nil;
         }
         
@@ -256,7 +249,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
             NSLog("Failed to get new location")
         }
         
-        NSLog("Got new location: \(String(describing: location))")
+        NSLog("Got new location: \(location!.debugDescription)")
         latestLocation = Date()
         
         self.location = location
