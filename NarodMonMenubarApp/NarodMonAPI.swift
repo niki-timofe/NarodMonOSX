@@ -214,7 +214,7 @@ public class NarodMonAPI {
         post(object: ["cmd": "appInit",
                       "uuid": uuid(),
                       "api_key": API_KEY,
-                      "version": "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String) (\(Bundle.main.infoDictionary?["CFBundleVersion"] as! String))",
+                      "version": "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)",
                       "lang": "ru",
                       "platform": String(format: "%d.%d.%d",
                                          osVersion.majorVersion,
