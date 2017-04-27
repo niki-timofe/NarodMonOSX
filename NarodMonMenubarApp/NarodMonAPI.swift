@@ -59,7 +59,6 @@ public class NarodMonAPI {
     
     public init(withAPIKey key: String) {
         API_KEY = key
-        keychain.synchronizable = true
         request.httpMethod = "POST"
     }
 
