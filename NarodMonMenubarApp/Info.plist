@@ -19,7 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>3.0.3</string>
 	<key>CFBundleVersion</key>
-	<string>450</string>
+	<string>474</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.weather</string>
 	<key>LSMinimumSystemVersion</key>

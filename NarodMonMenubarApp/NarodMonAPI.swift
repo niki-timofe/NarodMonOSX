@@ -60,6 +60,7 @@ public class NarodMonAPI {
     public init(withAPIKey key: String) {
         API_KEY = key
         request.httpMethod = "POST"
+        request.httpShouldUsePipelining = false
     }
 
     
