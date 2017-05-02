@@ -34,6 +34,7 @@ class StatusMenuController: NSObject {
     var latestLocation: Date? = nil
     
     var nearbySensors: [Sensor] = []
+    var readingsByTypes: [Int : Float] = [:]
     var offline: Bool = true
     var supressUpdateDialog: Bool = false
     var app: App?
@@ -100,7 +101,7 @@ class StatusMenuController: NSObject {
     }
     
     func requestSensorsValuesUpdate(force: Bool = true) {
-        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > 7.5 * 60) {return}
+        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > userDefaults.double(forKey: "UpdateSensorsValues")) {return}
         narodMon.sensorsValues(sensors: self.querySensors)
     }
     
@@ -184,12 +185,8 @@ extension StatusMenuController: NarodMonAPIDelegate {
             NSLog("\"sensorsValues\" failed")
             goOffline()
             return
-        } else {
-            NSLog("\"sensorsValues\" success")
-            latestValues = Date()
-            goOnline()
         }
-        
+        NSLog("\"sensorsValues\" success")
         
         var summs = [Int:Float]()
         var counters = [Int:Int]()
@@ -209,11 +206,35 @@ extension StatusMenuController: NarodMonAPIDelegate {
         for item in readingsMenuItems {
             statusMenu.removeItem(item)
         }
+        
         readingsMenuItems.removeAll()
         
+        var newReadings: [Int : Float] = [:];
+        
         for summ in summs {
-            if summ.key == 1 {continue}
-            readingsMenuItems.append(NSMenuItem(title: String(format: "%@\t%.1f%@", narodMon.types[summ.key].name, summ.value / Float(counters[summ.key]!), narodMon.types[summ.key].unit), action: nil, keyEquivalent: ""))
+            newReadings.updateValue(summ.value / Float(counters[summ.key]!), forKey: summ.key)
+        }
+        
+        if readingsByTypes.keys.contains(1) {
+            let delta = Double(abs(newReadings[1]! - self.readingsByTypes[1]!))
+            let currentInterval = -latestValues!.timeIntervalSinceNow
+            let newInterval = 0.1 / (delta / currentInterval)
+            
+            if delta != 0.0 {
+                NSLog("\"sensorsValues\" interval: \(currentInterval)s, new interval: \(newInterval)s, delta: \(delta)")
+                userDefaults.set(newInterval, forKey: "UpdateSensorsValues")
+                userDefaults.synchronize()
+            }
+        }
+        
+        readingsByTypes = newReadings
+        
+        latestValues = Date()
+        goOnline()
+        
+        for reading in readingsByTypes {
+            if reading.key == 1 {continue}
+            readingsMenuItems.append(NSMenuItem(title: String(format: "%@\t%.1f%@", narodMon.types[reading.key].name, reading.value, narodMon.types[reading.key].unit), action: nil, keyEquivalent: ""))
             statusMenu.insertItem(readingsMenuItems.last!, at: 3)
         }
         

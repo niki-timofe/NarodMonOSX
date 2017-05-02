@@ -21,6 +21,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         locationManager!.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager!.distanceFilter = 1000
         
+        userDefaults.register(defaults: ["UpdateAfterWake": 15,
+                                         "UpdateSensorsValues": 7.5 * 60])
+        
         controller = StatusMenuController()
         
         NSWorkspace.shared().notificationCenter.addObserver(self, selector: #selector(AppDelegate.wakeListener(_:)), name: NSNotification.Name.NSWorkspaceDidWake, object: nil)
