@@ -123,9 +123,10 @@ extension StatusMenuController: NarodMonAPIDelegate {
         if (app == nil) {
             goOffline()
 
-            NSLog("Will retry \"appInit\" #\(retryCount + 1)")
+            let retryInterval = TimeInterval(self.retryCount < 3 ? 10 : (10 * 60))
+            NSLog("Will retry \"appInit\" #\(retryCount + 1) in \(retryInterval)s")
             DispatchQueue.main.async {
-                Timer.scheduledTimer(withTimeInterval: self.retryCount < 3 ? 10 : (10 * 60), repeats: false, block: {_ in
+                Timer.scheduledTimer(withTimeInterval: retryInterval, repeats: false, block: {_ in
                     _ = self.requestAppInitUpdate()
                 })
             }
