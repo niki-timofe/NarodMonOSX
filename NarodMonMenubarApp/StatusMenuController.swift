@@ -25,6 +25,7 @@ class StatusMenuController: NSObject {
     var location: CLLocation?
     var fetchTimer: Timer?
     var retryCount: Int = 0
+    var sensorsNearbyUpdateInterval: Double = 450
     var querySensors: [Int] = []
     
     var wake: Date? = nil
@@ -101,7 +102,7 @@ class StatusMenuController: NSObject {
     }
     
     func requestSensorsValuesUpdate(force: Bool = true) {
-        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > userDefaults.double(forKey: "UpdateSensorsValues")) {return}
+        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > sensorsNearbyUpdateInterval) {return}
         narodMon.sensorsValues(sensors: self.querySensors)
     }
     
@@ -222,8 +223,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
             
             if delta != 0.0 {
                 NSLog("\"sensorsValues\" interval: \(currentInterval)s, new interval: \(newInterval)s, delta: \(delta)")
-                userDefaults.set(newInterval, forKey: "UpdateSensorsValues")
-                userDefaults.synchronize()
+                sensorsNearbyUpdateInterval = newInterval
             }
         }
         

@@ -21,8 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         locationManager!.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager!.distanceFilter = 1000
         
-        userDefaults.register(defaults: ["UpdateAfterWake": 15,
-                                         "UpdateSensorsValues": 7.5 * 60])
+        userDefaults.register(defaults: ["UpdateAfterWake": 15])
         
         controller = StatusMenuController()
         
