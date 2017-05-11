@@ -92,11 +92,11 @@ public class NarodMonAPI {
     ///
     /// - Returns: generated or saved UUID
     private func uuid() -> String {
-        var uuid = keychain.get("UUID")
+        var uuid = keychain.get("NarodMon Widget UUID")
         
         if (uuid == nil) {
             uuid = UUID().uuidString
-            keychain.set(uuid!, forKey: "UUID", withAccess: .accessibleAlways)
+            keychain.set(uuid!, forKey: "NarodMon Widget UUID", withAccess: .accessibleAlways)
         }
         
         return MD5(string: uuid!)

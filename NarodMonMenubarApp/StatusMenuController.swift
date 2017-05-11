@@ -52,7 +52,7 @@ class StatusMenuController: NSObject {
         statusMenu.addItem(NSMenuItem.separator())
         statusMenu.addItem(withTitle: "Выйти", action: #selector(StatusMenuController.quitBtnPress(sender:)), keyEquivalent: "")
         
-        narodMon = NarodMonAPI(withAPIKey: "40MHsctSKi4y6")
+        narodMon = NarodMonAPI(withAPIKey: "4Pk1qAgMhSyPc")
         
         super.init()
         
