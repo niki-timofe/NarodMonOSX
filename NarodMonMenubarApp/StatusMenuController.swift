@@ -268,6 +268,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
     func gotLocation(location: CLLocation?) {
         if location == nil {
             NSLog("Failed to get new location")
+            return
         }
         
         NSLog("Got new location: \(location!.debugDescription)")

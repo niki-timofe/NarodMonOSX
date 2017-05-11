@@ -58,6 +58,7 @@ extension AppDelegate: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        locationManager!.stopUpdatingLocation()
         NSLog("\"locationManager\" error: \(error), calling controller's \"updateLocation\" with nil argument")
         controller!.updateLocation(location: nil)
     }
