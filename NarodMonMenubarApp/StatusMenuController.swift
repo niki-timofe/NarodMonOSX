@@ -25,6 +25,7 @@ class StatusMenuController: NSObject {
     var location: CLLocation?
     var fetchTimer: Timer?
     var retryCount: Int = 0
+    var sensorsNearbyUpdateInterval: Double = 450
     var querySensors: [Int] = []
     
     var wake: Date? = nil
@@ -51,7 +52,7 @@ class StatusMenuController: NSObject {
         statusMenu.addItem(NSMenuItem.separator())
         statusMenu.addItem(withTitle: "Выйти", action: #selector(StatusMenuController.quitBtnPress(sender:)), keyEquivalent: "")
         
-        narodMon = NarodMonAPI(withAPIKey: "40MHsctSKi4y6")
+        narodMon = NarodMonAPI(withAPIKey: "4Pk1qAgMhSyPc")
         
         super.init()
         
@@ -101,7 +102,7 @@ class StatusMenuController: NSObject {
     }
     
     func requestSensorsValuesUpdate(force: Bool = true) {
-        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > userDefaults.double(forKey: "UpdateSensorsValues")) {return}
+        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > sensorsNearbyUpdateInterval) {return}
         narodMon.sensorsValues(sensors: self.querySensors)
     }
     
@@ -122,9 +123,10 @@ extension StatusMenuController: NarodMonAPIDelegate {
         if (app == nil) {
             goOffline()
 
-            NSLog("Will retry \"appInit\" #\(retryCount + 1)")
+            let retryInterval = TimeInterval(self.retryCount < 3 ? 10 : (10 * 60))
+            NSLog("Will retry \"appInit\" #\(retryCount + 1) in \(retryInterval)s")
             DispatchQueue.main.async {
-                Timer.scheduledTimer(withTimeInterval: self.retryCount < 3 ? 10 : (10 * 60), repeats: false, block: {_ in
+                Timer.scheduledTimer(withTimeInterval: retryInterval, repeats: false, block: {_ in
                     _ = self.requestAppInitUpdate()
                 })
             }
@@ -222,8 +224,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
             
             if delta != 0.0 {
                 NSLog("\"sensorsValues\" interval: \(currentInterval)s, new interval: \(newInterval)s, delta: \(delta)")
-                userDefaults.set(newInterval, forKey: "UpdateSensorsValues")
-                userDefaults.synchronize()
+                sensorsNearbyUpdateInterval = newInterval
             }
         }
         
@@ -268,6 +269,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
     func gotLocation(location: CLLocation?) {
         if location == nil {
             NSLog("Failed to get new location")
+            return
         }
         
         NSLog("Got new location: \(location!.debugDescription)")

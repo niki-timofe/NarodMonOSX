@@ -21,8 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         locationManager!.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager!.distanceFilter = 1000
         
-        userDefaults.register(defaults: ["UpdateAfterWake": 15,
-                                         "UpdateSensorsValues": 7.5 * 60])
+        userDefaults.register(defaults: ["UpdateAfterWake": 15])
         
         controller = StatusMenuController()
         
@@ -59,6 +58,7 @@ extension AppDelegate: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        locationManager!.stopUpdatingLocation()
         NSLog("\"locationManager\" error: \(error), calling controller's \"updateLocation\" with nil argument")
         controller!.updateLocation(location: nil)
     }
