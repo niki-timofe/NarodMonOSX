@@ -26,10 +26,18 @@ struct Reading {
     let time: Int
 }
 
-struct Type {
+struct Type : Hashable {
     let id: Int
     let name: String
     let unit: String
+    
+    var hashValue: Int {
+        return id.hashValue
+    }
+    
+    static func == (lhs: Type, rhs: Type) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 protocol NarodMonAPIDelegate: NSObjectProtocol {

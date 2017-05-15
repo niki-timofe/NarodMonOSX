@@ -18,26 +18,30 @@ class StatusMenuController: NSObject {
     let statusMenu: NSMenu = NSMenu()
     let updateTimeMenuItem: NSMenuItem = NSMenuItem()
     
-    var readingsMenuItems: [NSMenuItem] = []
-    
     let updateAlert = NSAlert()
+    let normalUpdateInterval: Double = 7.5 * 60
+    
+    var readingsMenuItems: [Type : NSMenuItem] = [:]
     
     var location: CLLocation?
     var fetchTimer: Timer?
-    var retryCount: Int = 0
-    var sensorsNearbyUpdateInterval: Double = 450
-    var querySensors: [Int] = []
     
     var wake: Date? = nil
     var latestAppInit: Date? = nil
     var latestNearby: Date? = nil
-    var latestValues: Date? = nil
     var latestLocation: Date? = nil
     
-    var nearbySensors: [Sensor] = []
-    var readingsByTypes: [Int : Float] = [:]
+    var lastSuccessUpdatesByTypes: [Type : Date] = [:]
+    var nextUpdatesByTypes: [Type : Date] = [:]
+    
+    var nearbySensorsByTypes: [Type : [Sensor]] = [:]
+    var readingsByTypes: [Type : Float] = [:]
+    
+    var retryCount: Int = 0
+    
     var offline: Bool = true
     var supressUpdateDialog: Bool = false
+    
     var app: App?
     
     override init() {
@@ -46,8 +50,8 @@ class StatusMenuController: NSObject {
         
         formatter.dateFormat = "H:mm"
         
-        statusMenu.addItem(withTitle: "Обновить", action: #selector(StatusMenuController.updateBtnPress(sender:)), keyEquivalent: "")
         statusMenu.addItem(updateTimeMenuItem)
+        statusMenu.addItem(withTitle: "Обновить", action: #selector(StatusMenuController.updateBtnPress(sender:)), keyEquivalent: "")
         statusMenu.addItem(NSMenuItem.separator())
         statusMenu.addItem(NSMenuItem.separator())
         statusMenu.addItem(withTitle: "Выйти", action: #selector(StatusMenuController.quitBtnPress(sender:)), keyEquivalent: "")
@@ -102,11 +106,25 @@ class StatusMenuController: NSObject {
     }
     
     func requestSensorsValuesUpdate(force: Bool = true) {
-        if !(force || Date().timeIntervalSince(latestValues ?? Date(timeIntervalSince1970: 0)) > sensorsNearbyUpdateInterval) {return}
-        narodMon.sensorsValues(sensors: self.querySensors)
+        if force {
+            narodMon.sensorsValues(sensors: nearbySensorsByTypes.values.flatMap({sensors in
+                sensors.map {$0.id}
+            }))
+        } else {
+            let thisUpdateSensors: [Int] = nearbySensorsByTypes.filter({type, _ in
+                (nextUpdatesByTypes[type] ?? Date()).compare(Date()) == ComparisonResult.orderedAscending
+            }).flatMap({_, sensors in
+                sensors.map {$0.id}
+            })
+            if thisUpdateSensors.count > 0 {
+                narodMon.sensorsValues(sensors: thisUpdateSensors)
+            }
+        }
     }
     
 }
+
+
 extension StatusMenuController: NarodMonAPIDelegate {
     func goOffline() {
         if (offline) {return}
@@ -166,20 +184,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
             }
         }
         
-        if fetchTimer != nil {
-            fetchTimer!.invalidate()
-        }
-        
-        DispatchQueue.main.async {
-            self.fetchTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(60), repeats: true, block: {_ in
-                if !self.requestAppInitUpdate(force: false) {
-                    if !self.requestLocationUpdate(force: false) {
-                        _ = self.requestSensorsValuesUpdate(force: false)
-                    }
-                }
-            })
-            self.fetchTimer!.fire()
-        }
+        _ = requestLocationUpdate()
     }
     
     func gotSensorsValues(rdgs: [Reading]?) {
@@ -196,8 +201,11 @@ extension StatusMenuController: NarodMonAPIDelegate {
         var current: Float = 0
         var curent_counter: Int = 0
         var sensor: Sensor
+        
+        let sensorsList: [Sensor] = nearbySensorsByTypes.values.joined().flatMap{$0}
+        
         for reading in rdgs! {
-            sensor = nearbySensors.first(where: {$0.id == reading.sensor})!
+            sensor = sensorsList.first(where: {sensor in sensor.id == reading.sensor})!
             current = summs.keys.contains(sensor.type.id) ? summs[sensor.type.id]! : 0
             summs.updateValue(current + reading.value, forKey: sensor.type.id)
             
@@ -205,42 +213,71 @@ extension StatusMenuController: NarodMonAPIDelegate {
             counters.updateValue(curent_counter + 1, forKey: sensor.type.id)
         }
         
-        for item in readingsMenuItems {
-            statusMenu.removeItem(item)
+        var newReadings: [Type : Float] = [:];
+        
+        for (typeId, value) in summs {
+            newReadings.updateValue(value / Float(counters[typeId]!), forKey: narodMon.types[typeId])
         }
         
-        readingsMenuItems.removeAll()
+        var nearestUpdate = Date.distantFuture
         
-        var newReadings: [Int : Float] = [:];
-        
-        for summ in summs {
-            newReadings.updateValue(summ.value / Float(counters[summ.key]!), forKey: summ.key)
-        }
-        
-        if readingsByTypes.keys.contains(1) {
-            let delta = Double(abs(newReadings[1]! - self.readingsByTypes[1]!))
-            let currentInterval = -latestValues!.timeIntervalSinceNow
-            let newInterval = 0.1 / (delta / currentInterval)
+        for (type, reading) in newReadings {
+            var newInterval = normalUpdateInterval
+            if readingsByTypes.keys.contains(type) {
+                let delta = Double(abs(reading - self.readingsByTypes[type]!))
+                let currentInterval = -lastSuccessUpdatesByTypes[type]!.timeIntervalSinceNow
+                newInterval = 0.1 / (delta / currentInterval)
+                let prelog = "\"sensorsValues\": \(type.name), delta: \(delta), interval: \(currentInterval)s => "
+                
+                if delta == 0 {
+                    newInterval = normalUpdateInterval
+                }
+                NSLog(prelog + "\(newInterval)s")
+            }
             
-            if delta != 0.0 {
-                NSLog("\"sensorsValues\" interval: \(currentInterval)s, new interval: \(newInterval)s, delta: \(delta)")
-                sensorsNearbyUpdateInterval = newInterval
+            let nextUpdateDate = Date().addingTimeInterval(newInterval)
+            
+            if nextUpdateDate.compare(nearestUpdate) == ComparisonResult.orderedAscending {
+                nearestUpdate = nextUpdateDate
+            }
+            
+            nextUpdatesByTypes.updateValue(nextUpdateDate, forKey: type)
+            lastSuccessUpdatesByTypes.updateValue(Date(), forKey: type)
+        }
+        
+        let deadLineIn = nearestUpdate.timeIntervalSinceNow
+        NSLog("Next timer in \(deadLineIn / 60)m")
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + deadLineIn, execute: {_ in
+            if !self.requestAppInitUpdate(force: false) {
+                if !self.requestLocationUpdate(force: false) {
+                    _ = self.requestSensorsValuesUpdate(force: false)
+                }
+            }
+        })
+        
+        for (type, value) in newReadings {
+            readingsByTypes.updateValue(value, forKey: type)
+        }
+        goOnline()
+        
+        for (type, item) in readingsMenuItems {
+            if readingsByTypes.keys.contains(type) {
+                statusMenu.removeItem(item)
             }
         }
         
-        readingsByTypes = newReadings
-        
-        latestValues = Date()
-        goOnline()
-        
-        for reading in readingsByTypes {
-            if reading.key == 1 {continue}
-            readingsMenuItems.append(NSMenuItem(title: String(format: "%@\t%.1f%@", narodMon.types[reading.key].name, reading.value, narodMon.types[reading.key].unit), action: nil, keyEquivalent: ""))
-            statusMenu.insertItem(readingsMenuItems.last!, at: 3)
+        for (type, reading) in readingsByTypes {
+            if type.id == 1 {continue}
+            let item = NSMenuItem(title: String(format: "%@\t%.1f%@\t(%@)", type.name, reading, type.unit, formatter.string(from: lastSuccessUpdatesByTypes[type]!)), action: nil, keyEquivalent: "")
+            readingsMenuItems.updateValue(item, forKey: type)
+            statusMenu.insertItem(item, at: 3)
         }
         
-        updateTimeMenuItem.title = formatter.string(from: Date())
-        statusItem.title = String.init(format: "%.1f\u{00B0}", summs[1]! / Float(counters[1]!))
+        if summs.keys.contains(1) {
+            updateTimeMenuItem.title = formatter.string(from: lastSuccessUpdatesByTypes[narodMon.types[1]]!)
+            statusItem.title = String.init(format: "%.1f\u{00B0}", summs[1]! / Float(counters[1]!))
+        }
     }
     
     /// Called when sensors is emitted
@@ -256,11 +293,11 @@ extension StatusMenuController: NarodMonAPIDelegate {
             latestNearby = Date()
         }
         
-        querySensors = []
-        nearbySensors = sensors!
-        
-        for sensor in nearbySensors {
-            querySensors.append(sensor.id)
+        for sensor in sensors! {
+            if !nearbySensorsByTypes.keys.contains(sensor.type) {
+                nearbySensorsByTypes.updateValue([], forKey: sensor.type)
+            }
+            nearbySensorsByTypes[sensor.type]!.append(sensor)
         }
         
         _ = requestSensorsValuesUpdate()

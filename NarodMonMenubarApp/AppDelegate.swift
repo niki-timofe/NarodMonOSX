@@ -32,7 +32,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func sleepListener(_ aNotification: NSNotification) {
         self.controller!.goOffline()
         self.controller!.wake = nil
-        if self.controller!.fetchTimer != nil {self.controller!.fetchTimer!.invalidate()}
         locationManager!.stopUpdatingLocation()
     }
     
