@@ -59,6 +59,7 @@ public class NarodMonAPI {
     private let API_KEY: String!
     private var request = URLRequest(url: URL(string: "https://narodmon.ru/api")!)
     private var keychain = KeychainSwift()
+    private var UUIDString: String = ""
     
     
     var types: [Type] = []
@@ -69,6 +70,15 @@ public class NarodMonAPI {
         API_KEY = key
         request.httpMethod = "POST"
         request.httpShouldUsePipelining = false
+        
+        var uuid = keychain.get("NarodMon Widget UUID")
+        
+        if uuid == nil {
+            uuid = UUID().uuidString
+            keychain.set(uuid!, forKey: "NarodMon Widget UUID", withAccess: .accessibleAlways)
+        }
+        
+        UUIDString = MD5(string: uuid!)
     }
 
     
@@ -85,31 +95,16 @@ public class NarodMonAPI {
         
         return digestData.map { String(format: "%02hhx", $0) }.joined()
     }
+    
     private func toJSONData(dict: [String:Any]) -> Data? {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: dict)
             return jsonData
         } catch {
-            NSLog("[API][JSON]: parsing failed: \(error.localizedDescription), UUID: \(uuid()), Data: \(dict)")
+            NSLog("[API][JSON]: parsing failed: \(error.localizedDescription), UUID: \(UUIDString), Data: \(dict)")
         }
         return nil
     }
-    
-    
-    /// UUID getting function
-    ///
-    /// - Returns: generated or saved UUID
-    private func uuid() -> String {
-        var uuid = keychain.get("NarodMon Widget UUID")
-        
-        if (uuid == nil) {
-            uuid = UUID().uuidString
-            keychain.set(uuid!, forKey: "NarodMon Widget UUID", withAccess: .accessibleAlways)
-        }
-        
-        return MD5(string: uuid!)
-    }
-    
     
     /// Processing functions
     private func appFromAppInit(data: Data) -> App? {
@@ -118,11 +113,15 @@ public class NarodMonAPI {
         do {
             json = try JSONSerialization.jsonObject(with: data, options: []) as! JSONDict
         } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
             return nil
         }
         
         types = []
+        
+        if json.keys.contains("error") {
+            return nil
+        }
         
         for type in json["types"] as! [[String:Any]] {
             var title = (type["name"] as! String).uppercaseFirst
@@ -145,7 +144,7 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
             return nil
         }
         
@@ -159,7 +158,7 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
             return nil
         }
         
@@ -194,7 +193,7 @@ public class NarodMonAPI {
             json = try JSONSerialization.jsonObject(with: data,
                                                     options: []) as! JSONDict
         } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(uuid()), Data: \(data)")
+            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
             return nil
         }
         
@@ -221,7 +220,7 @@ public class NarodMonAPI {
         let osVersion = ProcessInfo().operatingSystemVersion
         
         post(object: ["cmd": "appInit",
-                      "uuid": uuid(),
+                      "uuid": UUIDString,
                       "api_key": API_KEY,
                       "version": "\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)",
                       "lang": "ru",
@@ -239,14 +238,14 @@ public class NarodMonAPI {
         
         if (location != nil) {
             postObject = ["cmd": "userLocation",
-                          "uuid": uuid(),
+                          "uuid": UUIDString,
                           "api_key": API_KEY,
                           "lang": "ru",
                           "lat": location!.coordinate.latitude,
                           "lng": location!.coordinate.longitude]
         } else {
             postObject = ["cmd": "userLocation",
-                          "uuid": uuid(),
+                          "uuid": UUIDString,
                           "api_key": API_KEY,
                           "lang": "ru"]
         }
@@ -259,7 +258,7 @@ public class NarodMonAPI {
     
     public func sensorsNearby() {
         post(object: ["cmd": "sensorsNearby",
-                      "uuid": uuid(),
+                      "uuid": UUIDString,
                       "pub": 1,
                       "radius": 5,
                       "api_key": API_KEY],
@@ -270,7 +269,7 @@ public class NarodMonAPI {
     
     public func sensorsValues(sensors: [Int]) {
         post(object: ["cmd": "sensorsValues",
-                      "uuid": uuid(),
+                      "uuid": UUIDString,
                       "api_key": API_KEY,
                       "sensors": sensors],
              processWith: valuesFromSensorsValues) { (rdgs: Any?) -> () in
