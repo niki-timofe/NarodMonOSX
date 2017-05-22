@@ -14,14 +14,17 @@ class StatusMenuController: NSObject {
     let narodMon: NarodMonAPI
     let userDefaults: UserDefaults = UserDefaults.standard
     let formatter = DateFormatter()
+    let backgroundDispatchQueue = DispatchQueue(label: "ru.niki-timofe.narodmon.backgroundTasks", qos: DispatchQoS.background)
     
     let statusMenu: NSMenu = NSMenu()
     let updateTimeMenuItem: NSMenuItem = NSMenuItem()
     
     let updateAlert = NSAlert()
-    let normalUpdateInterval: Double = 7.5 * 60
+    let normalUpdateInterval: Double = 450
     
     var readingsMenuItems: [Type : NSMenuItem] = [:]
+    
+    var workItems: [String : DispatchWorkItem] = [:]
     
     var location: CLLocation?
     var fetchTimer: Timer?
@@ -50,8 +53,8 @@ class StatusMenuController: NSObject {
         
         formatter.dateFormat = "H:mm"
         
-        statusMenu.addItem(updateTimeMenuItem)
         statusMenu.addItem(withTitle: "Обновить", action: #selector(StatusMenuController.updateBtnPress(sender:)), keyEquivalent: "")
+        statusMenu.addItem(updateTimeMenuItem)
         statusMenu.addItem(NSMenuItem.separator())
         statusMenu.addItem(NSMenuItem.separator())
         statusMenu.addItem(withTitle: "Выйти", action: #selector(StatusMenuController.quitBtnPress(sender:)), keyEquivalent: "")
@@ -71,11 +74,29 @@ class StatusMenuController: NSObject {
         updateAlert.showsSuppressionButton = true
         updateAlert.addButton(withTitle: "Загрузить")
         updateAlert.addButton(withTitle: "Отменить")
+        
+        setWorkItems()
+    }
+    
+    func setWorkItems() {
+        workItems = ["chain": DispatchWorkItem(block: {_ in
+            if !self.requestAppInitUpdate(force: false) {
+                if !self.requestLocationUpdate(force: false) {
+                    _ = self.requestSensorsValuesUpdate(force: false)
+                }
+            }
+        }), "appInit": DispatchWorkItem(block: {
+            _ = self.requestAppInitUpdate()
+        })]
     }
     
     func updateBtnPress(sender: NSMenuItem) {
         NSLog("Force update from \"updateBtn\"")
-        _ = requestLocationUpdate(force: true)
+        if wake != nil {
+            _ = requestAppInitUpdate()
+        } else {
+            _ = requestLocationUpdate()
+        }
     }
     
     func quitBtnPress(sender: NSMenuItem) {
@@ -124,7 +145,6 @@ class StatusMenuController: NSObject {
     
 }
 
-
 extension StatusMenuController: NarodMonAPIDelegate {
     func goOffline() {
         if (offline) {return}
@@ -143,11 +163,8 @@ extension StatusMenuController: NarodMonAPIDelegate {
 
             let retryInterval = TimeInterval(self.retryCount < 3 ? 10 : (10 * 60))
             NSLog("Will retry \"appInit\" #\(retryCount + 1) in \(retryInterval)s")
-            DispatchQueue.main.async {
-                Timer.scheduledTimer(withTimeInterval: retryInterval, repeats: false, block: {_ in
-                    _ = self.requestAppInitUpdate()
-                })
-            }
+            
+            backgroundDispatchQueue.asyncAfter(deadline: .now() + retryInterval, execute: workItems["appInit"]!)
             retryCount += 1
             return
         }
@@ -161,11 +178,14 @@ extension StatusMenuController: NarodMonAPIDelegate {
             let successUpdateAfterWake = Date().timeIntervalSince(wake!),
             newUpdateAfterWakeInterval = (userDefaults.double(forKey: "UpdateAfterWake") + successUpdateAfterWake) / 2 * 0.85
             
-            userDefaults.set(newUpdateAfterWakeInterval, forKey: "UpdateAfterWake")
-            userDefaults.synchronize()
+            if (retryCount < 3) {
+                userDefaults.set(newUpdateAfterWakeInterval, forKey: "UpdateAfterWake")
+                userDefaults.synchronize()
+            }
             
             NSLog("Sucessful \"appInit\" after wake in \(successUpdateAfterWake)s new UpdateAfterWake interval: \(newUpdateAfterWakeInterval)s")
             wake = nil;
+            workItems["appInit"]!.cancel()
         }
         
         
@@ -237,24 +257,16 @@ extension StatusMenuController: NarodMonAPIDelegate {
             
             let nextUpdateDate = Date().addingTimeInterval(newInterval)
             
-            if nextUpdateDate.compare(nearestUpdate) == ComparisonResult.orderedAscending {
-                nearestUpdate = nextUpdateDate
-            }
-            
             nextUpdatesByTypes.updateValue(nextUpdateDate, forKey: type)
             lastSuccessUpdatesByTypes.updateValue(Date(), forKey: type)
         }
         
-        let deadLineIn = nearestUpdate.timeIntervalSinceNow
+        let nextUpdates = nextUpdatesByTypes.values.sorted()
+        
+        let deadLineIn = nextUpdates[nextUpdates.count / 2].timeIntervalSinceNow
         NSLog("Next timer in \(deadLineIn / 60)m")
         
-        DispatchQueue.global().asyncAfter(deadline: .now() + deadLineIn, execute: {_ in
-            if !self.requestAppInitUpdate(force: false) {
-                if !self.requestLocationUpdate(force: false) {
-                    _ = self.requestSensorsValuesUpdate(force: false)
-                }
-            }
-        })
+        backgroundDispatchQueue.asyncAfter(deadline: .now() + deadLineIn, execute: workItems["chain"]!)
         
         for (type, value) in newReadings {
             readingsByTypes.updateValue(value, forKey: type)
