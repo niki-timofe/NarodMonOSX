@@ -30,17 +30,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func sleepListener(_ aNotification: NSNotification) {
-        self.controller!.goOffline()
+        self.controller!.workItems.values.forEach {item in item.cancel()}
         self.controller!.wake = nil
         locationManager!.stopUpdatingLocation()
+        NSLog("Sleep!")
     }
     
     func wakeListener(_ aNotification: NSNotification) {
         self.controller!.goOffline()
         self.controller!.wake = Date()
-        Timer.scheduledTimer(withTimeInterval: userDefaults.double(forKey: "UpdateAfterWake"), repeats: false, block: {_ in
-            self.controller!.narodMon.appInit()
-        })
+        self.controller!.setWorkItems()
+        NSLog("Wake!")
+        let deadline = userDefaults.double(forKey: "UpdateAfterWake")
+        NSLog("Will try appInit after \(deadline)s")
+        self.controller!.backgroundDispatchQueue.asyncAfter(deadline: .now() + deadline, execute: self.controller!.workItems["appInit"]!)
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
