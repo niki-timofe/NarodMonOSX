@@ -8,62 +8,125 @@
 
 import CoreLocation
 
-struct App {
+public struct App {
     let lat: Float
     let lng: Float
     let latest: String
     let url: String
+    
+    init?(json: [String : Any]) {
+        guard let lat = json["lat"] as? Float,
+            let lng = json["lng"] as? Float,
+            let url = json["url"] as? String,
+            let latest = json["latest"] as? String
+            else { return nil }
+        
+        self.lat = lat
+        self.lng = lng
+        self.url = url
+        self.latest = latest
+    }
 }
 
-struct Sensor {
+public struct Sensor {
     let id: Int
     let type: Type
+    init?(json: [String : Any], types: [Int : Type]) {
+        guard let id = json["id"] as? Int,
+            let type = types[json["type"] as? Int ?? 0]
+            else { return nil }
+        
+        self.id = id
+        self.type = type
+    }
 }
 
-struct Reading {
+public struct Reading {
     let value: Float
     let sensor: Int
     let time: Int
+    
+    init?(json: JSONDict) {
+        guard let value = json["value"] as? Float,
+            let sensor = json["id"] as? Int,
+            let time = json["time"] as? Int
+            else { return nil }
+        
+        self.value = value
+        self.sensor = sensor
+        self.time = time
+    }
 }
 
-struct Type : Hashable {
+public struct Type : Hashable {
     let id: Int
     let name: String
     let unit: String
     
-    var hashValue: Int {
+    public var hashValue: Int {
         return id.hashValue
     }
     
-    static func == (lhs: Type, rhs: Type) -> Bool {
+    public static func == (lhs: Type, rhs: Type) -> Bool {
         return lhs.id == rhs.id
+    }
+    
+    init?(json: [String : Any]) {
+        guard let id = json["type"] as? Int,
+            let name = json["name"] as? String,
+            let unit = json["unit"] as? String
+            else { return nil }
+        
+        self.id = id
+        self.name = String(name.characters.split(separator: ",")[0]).uppercaseFirst
+        self.unit = unit
     }
 }
 
-protocol NarodMonAPIDelegate: NSObjectProtocol {
+public protocol NarodMonAPIDelegate: NSObjectProtocol {
     func appInitiated(app: App?)
     func gotSensorsValues(rdgs: [Reading]?)
     func gotSensorsList(sensors: [Sensor]?)
     func gotLocation(location: CLLocation?)
+    func gotError(error: URLError)
+    func gotError(error: Error)
 }
 
 extension String {
-    var first: String {return String(characters.prefix(1))}
     var last: String {return String(characters.suffix(1))}
-    var uppercaseFirst: String {return first.uppercased() + String(characters.dropFirst())}
+    var uppercaseFirst: String {return String(characters.prefix(1)).uppercased() + String(characters.dropFirst())}
 }
 
-typealias JSONDict = [String:Any]
+typealias JSONDict = [String : Any]
+
+extension Data {
+    func parseJSON() -> JSONDict? {
+        do {
+            return try JSONSerialization.jsonObject(with: self) as? JSONDict
+        } catch {
+            return nil
+        }
+    }
+}
+
+extension Dictionary where Key == String {
+    func toJSONData() -> Data? {
+        do {
+            return try JSONSerialization.data(withJSONObject: self)
+        } catch {
+            return nil
+        }
+    }
+}
 
 public class NarodMonAPI {
     private let API_KEY: String!
     private var request = URLRequest(url: URL(string: "https://narodmon.ru/api")!)
-    private var keychain = KeychainSwift()
-    private var UUIDString: String = ""
+    private var UUIDString: String
     
     
-    var types: [Type] = []
-    var delegate: NarodMonAPIDelegate!
+    var types: [Int : Type] = [:]
+    var delegate: NarodMonAPIDelegate?
     
     
     public init(withAPIKey key: String) {
@@ -71,14 +134,14 @@ public class NarodMonAPI {
         request.httpMethod = "POST"
         request.httpShouldUsePipelining = false
         
-        var uuid = keychain.get("NarodMon Widget UUID")
-        
-        if uuid == nil {
-            uuid = UUID().uuidString
-            keychain.set(uuid!, forKey: "NarodMon Widget UUID", withAccess: .accessibleAlways)
+        if let uuid = UserDefaults.standard.string(forKey: "NarodMonWidgetUUID") {
+            UUIDString = uuid
+        } else {
+            UUIDString = ""
+            let uuid = MD5(string: UUID().uuidString)
+            UserDefaults.standard.set(uuid, forKey: "NarodMonWidgetUUID")
+            UUIDString = uuid
         }
-        
-        UUIDString = MD5(string: uuid!)
     }
 
     
@@ -96,55 +159,36 @@ public class NarodMonAPI {
         return digestData.map { String(format: "%02hhx", $0) }.joined()
     }
     
-    private func toJSONData(dict: [String:Any]) -> Data? {
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: dict)
-            return jsonData
-        } catch {
-            NSLog("[API][JSON]: parsing failed: \(error.localizedDescription), UUID: \(UUIDString), Data: \(dict)")
-        }
-        return nil
-    }
-    
     /// Processing functions
     private func appFromAppInit(data: Data) -> App? {
-        let json: JSONDict
-        
-        do {
-            json = try JSONSerialization.jsonObject(with: data, options: []) as! JSONDict
-        } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
+        guard let json = data.parseJSON() else {
+            let log = "[API][JSON]: parsing failed, UUID: \(UUIDString), Data: \(data)"
+            NSLog(log)
+            sendReport(log: log)
+            self.delegate?.gotError(error: NSError())
             return nil
         }
         
-        types = []
-        
-        if json.keys.contains("error") {
+        types.removeAll()
+        guard let thisTypes = json["types"] as? [[String:Any]] else {
             return nil
         }
         
-        for type in json["types"] as! [[String:Any]] {
-            var title = (type["name"] as! String).uppercaseFirst
-            
-            title = title.components(separatedBy: ",")[0]
-            
-            types.append(Type(id: type["type"] as! Int, name: title, unit: type["unit"] as! String))
+        for type in thisTypes {
+            if let thisType = Type(json: type) {
+                types[thisType.id] = thisType
+            }
         }
         
-        return App(lat: json["lat"] as! Float,
-                   lng: json["lng"] as! Float,
-                   latest: json["latest"] as! String,
-                   url: json["url"] as! String)
+        return App(json: json)
     }
     
     private func locationFromUserLocation(data: Data) -> CLLocation? {
-        let json: JSONDict
-        
-        do {
-            json = try JSONSerialization.jsonObject(with: data,
-                                                    options: []) as! JSONDict
-        } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
+        guard let json = data.parseJSON() else {
+            let log = "[API][JSON]: parsing failed, UUID: \(UUIDString), Data: \(data)"
+            NSLog(log)
+            sendReport(log: log)
+            self.delegate?.gotError(error: NSError())
             return nil
         }
         
@@ -152,33 +196,28 @@ public class NarodMonAPI {
     }
     
     private func sensorsFromSensorsNearby(data: Data) -> [Sensor]? {
-        let json: JSONDict
-        
-        do {
-            json = try JSONSerialization.jsonObject(with: data,
-                                                    options: []) as! JSONDict
-        } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
+        guard let json = data.parseJSON() else {
+            let log = "[API][JSON]: parsing failed, UUID: \(UUIDString), Data: \(data)"
+            NSLog(log)
+            sendReport(log: log)
+            self.delegate?.gotError(error: NSError())
             return nil
         }
         
         var senss: [Sensor] = []
-        if !(json.keys.contains("devices")) {
+        guard let devices = json["devices"] as? [[String : Any]] else {
             return nil
         }
-        for device in json["devices"] as! [[String:Any]] {
-            if !(device.keys.contains("sensors")) {
-                return nil
-            }
-            for sensor in device["sensors"] as! [[String:Any]] {
-                if !(sensor.keys.contains("id") && sensor.keys.contains("type")) {
-                    return nil
+        for device in devices {
+            if let sensors = device["sensors"] as? [[String : Any]] {
+                for sensor in sensors {
+                    if let thisSensor = Sensor(json: sensor, types: self.types) {
+                        senss.append(thisSensor)
+                    } else {
+                        appInit()
+                        return nil
+                    }
                 }
-                if types.count < sensor["type"] as! Int {
-                    appInit()
-                    return nil
-                }
-                senss.append(Sensor(id: sensor["id"] as! Int, type: types[sensor["type"] as! Int]))
             }
         }
         
@@ -186,29 +225,23 @@ public class NarodMonAPI {
     }
     
     private func valuesFromSensorsValues(data: Data) -> [Reading]? {
-        typealias JSONDict = [String:Any]
-        let json: JSONDict
-        
-        do {
-            json = try JSONSerialization.jsonObject(with: data,
-                                                    options: []) as! JSONDict
-        } catch {
-            NSLog("[API][JSON]: parsing failed: \(error), UUID: \(UUIDString), Data: \(data)")
+        guard let json = data.parseJSON() else {
+            let log = "[API][JSON]: parsing failed, UUID: \(UUIDString), Data: \(data)"
+            NSLog(log)
+            sendReport(log: log)
+            self.delegate?.gotError(error: NSError())
             return nil
         }
         
         var readings: [Reading] = []
         
-        if !(json.keys.contains("sensors")) {
+        guard let sensors = json["sensors"] as? [[String:Any]] else {
             return nil
         }
-        for sensor in json["sensors"] as! [[String:Any]] {
-            if !(sensor.keys.contains("value") && sensor.keys.contains("id") && sensor.keys.contains("time")) {
-                return nil
+        for sensor in sensors {
+            if let thisReading = Reading(json: sensor) {
+                readings.append(thisReading)
             }
-            readings.append(Reading(value: sensor["value"] as! Float,
-                                    sensor: sensor["id"] as! Int,
-                                    time: sensor["time"] as! Int))
         }
         
         return readings
@@ -277,6 +310,14 @@ public class NarodMonAPI {
         }
     }
     
+    public func sendReport(log: String) {
+        post(object: ["cmd": "sendReport",
+                      "uuid": UUIDString,
+                      "api_key": API_KEY,
+                      "time": Date().timeIntervalSince1970,
+                      "logs": log], processWith: { (data: Data) -> Bool in false }, delegated: { _ in })
+    }
+    
     
     /// HTTP POST Function
     ///
@@ -284,20 +325,27 @@ public class NarodMonAPI {
     ///   - postObject: Dictionary to post
     ///   - process: Function which will process recieved Data
     ///   - delegated: Delegate function, where processed data will be returned
-    private func post(object postObject: [String : Any],  processWith process: @escaping (_ data: Data) -> Any?,  delegated: @escaping (_: Any?) -> ()) {
-        let requestBody = toJSONData(dict: postObject)
+    private func post(object postObject: [String : Any], processWith process: @escaping (_ data: Data) -> Any?,  delegated: @escaping (_: Any?) -> ()) {
+        guard let requestBody = postObject.toJSONData() else {
+            let log = "[API][JSON]: parsing failed UUID: \(UUIDString), Data: \(postObject)"
+            NSLog(log)
+            sendReport(log: log)
+            self.delegate?.gotError(error: NSError())
+            return
+        }
         NSLog("[API]: Trying \"\(postObject["cmd"] ?? "nil")\"")
         request.httpBody = requestBody
         
         let task = URLSession.shared.dataTask(with: request) {data, response, error in guard let data = data, error == nil else {
+            self.delegate?.gotError(error: error! as! URLError)
             NSLog("[API][HTTP]: error: \(String(describing: error!.localizedDescription))\n" +
-                "for request: \(String.init(data: requestBody!, encoding: String.Encoding.utf8) ?? "nil")")
+                "for request: \(String.init(data: requestBody, encoding: String.Encoding.utf8) ?? "nil")")
             delegated(_: nil)
             return
             }
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {
                 NSLog("[API][HTTP]: got status code: \(httpStatus.statusCode)\n" +
-                    "for request: \(String.init(data: requestBody!, encoding: String.Encoding.utf8) ?? "nil")")
+                    "for request: \(String.init(data: requestBody, encoding: String.Encoding.utf8) ?? "nil")")
                 return
             }
             

@@ -12,7 +12,6 @@
 		11A3D1DF1E82CE5D00E7163D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A3D1DE1E82CE5D00E7163D /* AppDelegate.swift */; };
 		11A3D1E11E82CE5D00E7163D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11A3D1E01E82CE5D00E7163D /* Assets.xcassets */; };
 		11A3D1F41E82D36D00E7163D /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A3D1F31E82D36D00E7163D /* main.swift */; };
-		11A525D61E923B86006418A1 /* KeychainSwiftDistrib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A525D51E923B86006418A1 /* KeychainSwiftDistrib.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,7 +23,6 @@
 		11A3D1E01E82CE5D00E7163D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11A3D1E51E82CE5D00E7163D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		11A3D1F31E82D36D00E7163D /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		11A525D51E923B86006418A1 /* KeychainSwiftDistrib.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainSwiftDistrib.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,7 +39,6 @@
 		11775E9E1E88B3E300EB88B0 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				11A525D71E923C85006418A1 /* Libs */,
 				11775E9C1E88AB2D00EB88B0 /* BridgingHeader.h */,
 				11A3D1F31E82D36D00E7163D /* main.swift */,
 				11A3D1DE1E82CE5D00E7163D /* AppDelegate.swift */,
@@ -75,14 +72,6 @@
 				11A3D1E01E82CE5D00E7163D /* Assets.xcassets */,
 			);
 			path = NarodMonMenubarApp;
-			sourceTree = "<group>";
-		};
-		11A525D71E923C85006418A1 /* Libs */ = {
-			isa = PBXGroup;
-			children = (
-				11A525D51E923B86006418A1 /* KeychainSwiftDistrib.swift */,
-			);
-			name = Libs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,7 +172,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11A525D61E923B86006418A1 /* KeychainSwiftDistrib.swift in Sources */,
 				112636A81E82F20300599AB0 /* NarodMonAPI.swift in Sources */,
 				11A3D1F41E82D36D00E7163D /* main.swift in Sources */,
 				112636A61E82EF5800599AB0 /* StatusMenuController.swift in Sources */,

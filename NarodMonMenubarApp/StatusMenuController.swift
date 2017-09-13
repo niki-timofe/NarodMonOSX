@@ -24,6 +24,8 @@ class StatusMenuController: NSObject {
     
     var readingsMenuItems: [Type : NSMenuItem] = [:]
     
+    var shownType = 1
+    
     var workItems: [String : DispatchWorkItem] = [:]
     
     var location: CLLocation?
@@ -92,10 +94,10 @@ class StatusMenuController: NSObject {
     
     func updateBtnPress(sender: NSMenuItem) {
         NSLog("Force update from \"updateBtn\"")
-        if wake != nil {
-            _ = requestAppInitUpdate()
-        } else {
+        if wake == nil {
             _ = requestLocationUpdate()
+        } else {
+            _ = requestAppInitUpdate()
         }
     }
     
@@ -133,7 +135,7 @@ class StatusMenuController: NSObject {
             }))
         } else {
             let thisUpdateSensors: [Int] = nearbySensorsByTypes.filter({type, _ in
-                (nextUpdatesByTypes[type] ?? Date()).compare(Date()) == ComparisonResult.orderedAscending
+                (nextUpdatesByTypes[type] ?? Date()) >= Date()
             }).flatMap({_, sensors in
                 sensors.map {$0.id}
             })
@@ -143,6 +145,37 @@ class StatusMenuController: NSObject {
         }
     }
     
+    func readingsMenuItemClick(sender: NSMenuItem) {
+        if let shownItem = self.statusMenu.item(withTag: self.shownType) {
+            shownItem.state = NSOffState
+        }
+        
+        if let typeForStatusItem = narodMon.types[self.shownType] {
+            if let readingForShowing = readingsByTypes[typeForStatusItem] {
+                shownType = sender.tag
+                sender.state = NSOnState
+                NSLog("Set shown reading to \(shownType)")
+                statusItem.title = String.init(format: "%.1f%@", readingForShowing, typeForStatusItem.unit)
+            }
+        }
+        
+    }
+    
+    func outdatedModal() {
+        DispatchQueue.main.async {
+            let errorAlert = NSAlert()
+            errorAlert.alertStyle = NSAlertStyle.warning
+            errorAlert.messageText = "Произошла ошибка при получении данных от API"
+            errorAlert.addButton(withTitle: "Проверить")
+            errorAlert.addButton(withTitle: "Не проверять")
+            errorAlert.informativeText = "Вероятно Вы используете устаревшую версию приложения (v\(Bundle.main.infoDictionary!["CFBundleShortVersionString"] as! String)). Стоит проверить, нет ли новой версии на GitHub"
+            if errorAlert.runModal() == NSAlertSecondButtonReturn {
+                if let url = URL(string: "https://github.com/niki-timofe/NarodMonOSX/releases/latest"), NSWorkspace.shared().open(url) {
+                    NSApp.terminate(self.updateAlert)
+                }
+            }
+        }
+    }
 }
 
 extension StatusMenuController: NarodMonAPIDelegate {
@@ -150,7 +183,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
         if (offline) {return}
         NSLog("Going offline")
         offline = true
-        statusItem.title = statusItem.title! + "?"
+        statusItem.title = (statusItem.title ?? "") + "?"
     }
     
     func goOnline() {
@@ -174,8 +207,8 @@ extension StatusMenuController: NarodMonAPIDelegate {
         self.app = app
         retryCount = 0
         
-        if wake != nil {
-            let successUpdateAfterWake = Date().timeIntervalSince(wake!),
+        if let thisWake = wake {
+            let successUpdateAfterWake = Date().timeIntervalSince(thisWake),
             newUpdateAfterWakeInterval = (userDefaults.double(forKey: "UpdateAfterWake") + successUpdateAfterWake) / 2 * 0.85
             
             if (retryCount < 3) {
@@ -194,7 +227,7 @@ extension StatusMenuController: NarodMonAPIDelegate {
         
         if (latestVersion.compare(currentVersion, options: NSString.CompareOptions.numeric) == ComparisonResult.orderedDescending) {
             DispatchQueue.main.async {
-                if !self.supressUpdateDialog && self.updateAlert.runModal() == NSAlertFirstButtonReturn {
+                if self.supressUpdateDialog && self.updateAlert.runModal() == NSAlertFirstButtonReturn {
                     if let url = URL(string: "https://github.com/niki-timofe/NarodMonOSX/releases/latest"), NSWorkspace.shared().open(url) {
                         NSApp.terminate(self.updateAlert)
                     }
@@ -208,69 +241,79 @@ extension StatusMenuController: NarodMonAPIDelegate {
     }
     
     func gotSensorsValues(rdgs: [Reading]?) {
-        if rdgs == nil {
+        guard let thisReadings = rdgs else {
             NSLog("\"sensorsValues\" failed")
             goOffline()
             return
         }
+        
         NSLog("\"sensorsValues\" success")
+        workItems["chain"]!.cancel()
         
-        var summs = [Int:Float]()
-        var counters = [Int:Int]()
-        
-        var current: Float = 0
-        var curent_counter: Int = 0
-        var sensor: Sensor
+        var summs = [Int : Float]()
+        var counters = [Int : Int]()
         
         let sensorsList: [Sensor] = nearbySensorsByTypes.values.joined().flatMap{$0}
         
-        for reading in rdgs! {
-            sensor = sensorsList.first(where: {sensor in sensor.id == reading.sensor})!
-            current = summs.keys.contains(sensor.type.id) ? summs[sensor.type.id]! : 0
-            summs.updateValue(current + reading.value, forKey: sensor.type.id)
-            
-            curent_counter = counters.keys.contains(sensor.type.id) ? counters[sensor.type.id]! : 0
-            counters.updateValue(curent_counter + 1, forKey: sensor.type.id)
+        for reading in thisReadings {
+            if let sensor = sensorsList.first(where: {sensor in sensor.id == reading.sensor}) {
+                let current = summs[sensor.type.id] ?? 0
+                summs.updateValue(current + reading.value, forKey: sensor.type.id)
+                
+                let curent_counter = counters[sensor.type.id] ?? 0
+                counters.updateValue(curent_counter + 1, forKey: sensor.type.id)
+            }
         }
         
         var newReadings: [Type : Float] = [:];
         
         for (typeId, value) in summs {
-            newReadings.updateValue(value / Float(counters[typeId]!), forKey: narodMon.types[typeId])
+            if let counter = counters[typeId] {
+                newReadings.updateValue(value / Float(counter), forKey: narodMon.types[typeId]!)
+            }
         }
-        
-        var nearestUpdate = Date.distantFuture
         
         for (type, reading) in newReadings {
-            var newInterval = normalUpdateInterval
-            if readingsByTypes.keys.contains(type) {
-                let delta = Double(abs(reading - self.readingsByTypes[type]!))
-                let currentInterval = -lastSuccessUpdatesByTypes[type]!.timeIntervalSinceNow
-                newInterval = 0.1 / (delta / currentInterval)
-                let prelog = "\"sensorsValues\": \(type.name), delta: \(delta), interval: \(currentInterval)s => "
-                
-                if delta == 0 {
-                    newInterval = normalUpdateInterval
-                }
-                NSLog(prelog + "\(newInterval)s")
+            NSLog(type.name + " " + String(reading))
+            guard let thisReading = readingsByTypes[type] else {
+                lastSuccessUpdatesByTypes.updateValue(Date(), forKey: type)
+                nextUpdatesByTypes.updateValue(Date().addingTimeInterval(normalUpdateInterval), forKey: type)
+                readingsByTypes.updateValue(reading, forKey: type)
+                NSLog("\"sensorsValues\": \(type.name) => \(normalUpdateInterval)s")
+                continue
+            }
+            readingsByTypes.updateValue(reading, forKey: type)
+            
+            NSLog(String(reading) + " " + type.name)
+            
+            let delta = Double(abs(reading - thisReading))
+            guard let thisReadingUpdatedAt = lastSuccessUpdatesByTypes[type] else {
+                lastSuccessUpdatesByTypes.updateValue(Date(), forKey: type)
+                continue
+            }
+            lastSuccessUpdatesByTypes.updateValue(Date(), forKey: type)
+            
+            let currentInterval = -thisReadingUpdatedAt.timeIntervalSinceNow
+            var newInterval = 0.1 / (delta / currentInterval)
+            
+            if delta == 0 {
+                newInterval = normalUpdateInterval
             }
             
-            let nextUpdateDate = Date().addingTimeInterval(newInterval)
-            
-            nextUpdatesByTypes.updateValue(nextUpdateDate, forKey: type)
-            lastSuccessUpdatesByTypes.updateValue(Date(), forKey: type)
+            nextUpdatesByTypes.updateValue(Date().addingTimeInterval(newInterval), forKey: type)
+            NSLog("\"sensorsValues\": \(type.name), delta: \(delta), \(currentInterval) => \(newInterval)s")
         }
         
-        let nextUpdates = nextUpdatesByTypes.values.sorted()
+        let nextUpdates = nextUpdatesByTypes.values.drop(while: {$0 < Date()}).sorted()
         
-        let deadLineIn = nextUpdates[nextUpdates.count / 2].timeIntervalSinceNow
+        let deadLineIn = nextUpdates.reduce(0, {prev, cur in
+            return prev + cur.timeIntervalSinceNow
+        }) / Double(nextUpdates.count)
+        
+        setWorkItems()
         NSLog("Next timer in \(deadLineIn / 60)m")
-        
         backgroundDispatchQueue.asyncAfter(deadline: .now() + deadLineIn, execute: workItems["chain"]!)
         
-        for (type, value) in newReadings {
-            readingsByTypes.updateValue(value, forKey: type)
-        }
         goOnline()
         
         for (type, item) in readingsMenuItems {
@@ -279,16 +322,33 @@ extension StatusMenuController: NarodMonAPIDelegate {
             }
         }
         
+        var readingsStrings = [Type : String]()
+        var maxStringLength = 0
+        
         for (type, reading) in readingsByTypes {
-            if type.id == 1 {continue}
-            let item = NSMenuItem(title: String(format: "%@\t%.1f%@\t(%@)", type.name, reading, type.unit, formatter.string(from: lastSuccessUpdatesByTypes[type]!)), action: nil, keyEquivalent: "")
+            let readingString = String(format: "%.1f%@", reading, type.unit)
+            let length = readingString.characters.count + type.name.characters.count
+            if length > maxStringLength {
+                maxStringLength = length
+            }
+            readingsStrings.updateValue(readingString, forKey: type)
+        }
+        
+        for (type, string) in readingsStrings {
+            let item = NSMenuItem(title: "\(type.name)\t\(String(repeating: "\t", count: (maxStringLength - (string.characters.count + type.name.characters.count)) / 7))\(string)", action: #selector(StatusMenuController.readingsMenuItemClick(sender:)), keyEquivalent: "")
+            item.tag = type.id
+            item.target = self
+            item.state = type.id == shownType ? NSOnState : NSOffState
+            
             readingsMenuItems.updateValue(item, forKey: type)
             statusMenu.insertItem(item, at: 3)
         }
         
-        if summs.keys.contains(1) {
-            updateTimeMenuItem.title = formatter.string(from: lastSuccessUpdatesByTypes[narodMon.types[1]]!)
-            statusItem.title = String.init(format: "%.1f\u{00B0}", summs[1]! / Float(counters[1]!))
+        updateTimeMenuItem.title = formatter.string(from: Date())
+        if let typeForStatusItem = narodMon.types[self.shownType] {
+            if let readingForShow = readingsByTypes[typeForStatusItem] {
+                self.statusItem.title = String.init(format: "%.1f%@", readingForShow, typeForStatusItem.unit)
+            }
         }
     }
     
@@ -304,6 +364,8 @@ extension StatusMenuController: NarodMonAPIDelegate {
             NSLog("\"sensorsNearby\" success")
             latestNearby = Date()
         }
+        
+        nearbySensorsByTypes.removeAll()
         
         for sensor in sensors! {
             if !nearbySensorsByTypes.keys.contains(sensor.type) {
@@ -326,5 +388,18 @@ extension StatusMenuController: NarodMonAPIDelegate {
         
         self.location = location
         requestSensorsNearbyUpdate()
+    }
+    
+    func gotError(error: URLError) {
+        let errorCode = error.errorCode
+        if errorCode == NSURLErrorTimedOut || errorCode == NSURLErrorNotConnectedToInternet  {
+            return
+        }
+        NSLog("[API][HTTP]: error: ", error.localizedDescription)
+        outdatedModal()
+    }
+    
+    func gotError(error: Error) {
+        outdatedModal()
     }
 }
